@@ -11,7 +11,7 @@ ScientificTypesBase = "30f210dd-8aff-4c5f-94ba-8e64358c1161"
 [compat]
 Example = "0.5"
 MLJModelInterface = "1"
-ScientificTypesBase = "1, 2"
+ScientificTypesBase = "1, 2, 3"
 julia = "1"
 
 [extras]
