@@ -26,17 +26,40 @@ finalize(message, verbosity) = verbosity < 2 ? "" : message
 
 # # ATTEMPTORS
 
+# TODO: Instead, in ****** below, use `MLJ.load_path`, after MLJModels
+# is updated to 0.16. And delete the two methods immediately
+# following. What's required will already be in MLJModels 0.15.10, but
+# the current implementation avoids an explicit MLJModels dependency
+# for MLJTest.
+load_path(model_type) = MLJ.load_path(model_type)
+function load_path(proxy::NamedTuple)
+    handle = (name=proxy.name, pkg=proxy.package_name)
+    return MLJ.MLJModels.INFO_GIVEN_HANDLE[handle][:load_path]
+end
+
 function model_type(proxy, mod; verbosity=1)
+    # check interface package really is in current environment:
     message = "Loading model type "
-    attempt(finalize(message, verbosity)) do
-        load_path = MLJ.load_path(proxy)
-        import_ex = "import "*load_path |> Meta.parse
+    model_type, outcome = attempt(finalize(message, verbosity)) do
+        load_path = MLJTest.load_path(proxy) # MLJ.load_path(proxy) *****
+        path_components = split(load_path, '.')
+        api_pkg_ex = first(path_components) |> Symbol
+        import_ex = :(import $api_pkg_ex)
         path_ex = load_path |> Meta.parse
         quote
             $import_ex
             $path_ex
         end |>  mod.eval
     end
+
+    # catch case of interface package not in current environment:
+    if outcome == "×" &&
+        model_type isa ArgumentError &&
+        contains(model_type.msg, "not found in current path")
+        throw(model_type)
+    end
+
+    return model_type, outcome
 end
 
 function model_instance(model_type; verbosity=1)

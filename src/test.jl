@@ -19,19 +19,19 @@ using `data` for training. Here `mod` should be the module from which
 `test` is called (generally, `mod=@__MODULE__` will work). Here
 `models` is either:
 
-- A collection of model types. The model types must already be
-  imported in the module `mod`.
+- A collection of model types. These types must already be loaded into
+  `mod`.
 
-- A collection of model proxies.  A *model proxy* is any named-tuple
-  including `:name` and `:package_name` as keys, and whose
-  corresponding values point to a model in the [MLJ Model
-  Registry](https://github.com/JuliaAI/MLJModels.jl/tree/dev/src/registry). The
-  elements of `MLJModels.models()` are model proxies,
-  for example. The interface packages providing the models must be in
-  the current environment, but the packages need not be loaded.
+- A collection of named tuples, where each tuple includes `:name` and
+  `:package_name` as keys, and whose corresponding values point to a
+  model in the [MLJ Model
+  Registry](https://github.com/JuliaAI/MLJModels.jl/tree/dev/src/registry).
+  `MLJ.models(...)` always returns such a collection. The
+  interface packages providing the models must be in the current
+  environment, but the packages need not be loaded.
 
-Specify `loading_only=true` to restrict to the `model_type` test (see
-below).
+Specify `loading_only=true` to only test model loading, as detailed in
+the test called `model_type` below.
 
 
 # Return value
@@ -61,21 +61,25 @@ type:
 ```
 using Test
 X, y = MLJ.make_blobs()
-failures, summary = test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
+failures, summary = MLJTest.test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
 @test isempty(failures)
 ```
 
 ## Testing models after filtering models in the registry
 
-The following applies the tests to the first five single-target
-regressors appearing in the MLJ Model Registry, assuming the interface
-packages providing them are in the current environment:
+The following applies integration tests to all regressors provided by
+the package GLM.jl that are also in the MLJ Model Registry. Since
+GLM.jl models are provided through the interface package
+`MLJGLMInterface`, this must be in the current environment:
 
 ```
 using DataFrames
+Pkg.add("MLJGLMInterface")
 X, y = make_regression();
-regressors = models(matching(X, y))
-failures, summary = test(regressors[1:5], X, y, verbosity=1)
+regressors = models(matching(X, y)) do m
+    m.package_name == "GLM"
+end
+failures, summary = MLJTest.test(regressors, X, y, verbosity=1, mod=@__MODULE__)
 summary |> DataFrame # for better display
 ```
 
@@ -84,33 +88,33 @@ summary |> DataFrame # for better display
 Tests are applied in sequence. When a test fails, subsequent tests for
 that model are skipped. The following are applied to all models:
 
-- `model_type`: Load model type using registry (if proxies are
+- `:model_type`: Load model type using registry (if named tuples are
   provided) or using `load_path(model_type)` (if types are provided, to
-  check `load_path` trait correctly overloaded).
+  check `load_path` trait is correctly overloaded).
 
-- `model_instance`: Create a default instance.
+- `:model_instance`: Create a default instance.
 
-- `fitted_machine`: Bind instance to data in a machine and `fit!`
+- `:fitted_machine`: Bind instance to data in a machine and `fit!`
 
-- `operations`: Call implemented operations, such as `predict` and `transform`
+- `:operations`: Call implemented operations, such as `predict` and `transform`
 
 These additional tests are applied to `Supervised` models:
 
-- `threshold_prediction`: If the model is `Probablisitic` and
+- `:threshold_prediction`: If the model is `Probablisitic` and
   `scitype(data[2]) <: Finite{2}` (binary classification) then wrap
   model using `BinaryThresholdPredictor` and `fit!`.
 
-- `evaluation`: Assuming MLJ is able to infer a suitable `measure`
+- `:evaluation`: Assuming MLJ is able to infer a suitable `measure`
   (metric), evaluate the performance of the model using `evaluate!`
   and a `Holdout` set.
 
-- `tuned_pipe_evaluation`: Repeat the `evauation` test but first
+- `:tuned_pipe_evaluation`: Repeat the `:evauation` test but first
   insert model in a pipeline with input standardization, and wrap in
   `TunedModel` (only the default instance is actually evaluated)
 
-- Repeat the `evaluation` test but first wrap as an `EnsembleModel`.
+- Repeat the `:evaluation` test but first wrap as an `EnsembleModel`.
 
-- If the model is iterable, repeat the `evaluation` test
+- If the model is iterable, repeat the `:evaluation` test
   but first wrap as an `IteratedModel`.
 
 """
