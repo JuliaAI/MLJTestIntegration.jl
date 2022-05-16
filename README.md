@@ -6,7 +6,7 @@ interface.
 
 | Linux         | Coverage |
 | :------------ | :------- |
-| [![Build Status](https://github.com/JuliaAI/MLJTestInterface.jl/workflows/CI/badge.svg)](https://github.com/JuliaAI/MLJTestInterface.jl/actions) | [![Coverage](https://codecov.io/gh/JuliaAI/MLJTestInterface.jl/branch/master/graph/badge.svg)](https://codecov.io/github/JuliaAI/MLJTestInterface.jl?branch=master) |
+| [![Build Status](https://github.com/JuliaAI/MLJTest.jl/workflows/CI/badge.svg)](https://github.com/JuliaAI/MLJTest.jl/actions) | [![Coverage](https://codecov.io/gh/JuliaAI/MLJTest.jl/branch/master/graph/badge.svg)](https://codecov.io/github/JuliaAI/MLJTest.jl?branch=master) |
 
 # Installation
 
