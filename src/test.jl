@@ -26,11 +26,13 @@ using `data` for training. Here `mod` should be the module from which
   including `:name` and `:package_name` as keys, and whose
   corresponding values point to a model in the [MLJ Model
   Registry](https://github.com/JuliaAI/MLJModels.jl/tree/dev/src/registry). The
-  elements of `MLJModels.models()`are model proxies,
+  elements of `MLJModels.models()` are model proxies,
   for example. The interface packages providing the models must be in
   the current environment, but the packages need not be loaded.
 
-Specify `loading_only` to restrict to the test `
+Specify `loading_only=true` to restrict to the `model_type` test (see
+below).
+
 
 # Return value
 
@@ -82,9 +84,9 @@ summary |> DataFrame # for better display
 Tests are applied in sequence. When a test fails, subsequent tests for
 that model are skipped. The following are applied to all models:
 
-- `model_type`: Load model type from registry (if proxies are
-  provided) or using `load_path(model)` (if types are provided, to
-  check `load_path(::SomeModelType)` is correct).
+- `model_type`: Load model type using registry (if proxies are
+  provided) or using `load_path(model_type)` (if types are provided, to
+  check `load_path` trait correctly overloaded).
 
 - `model_instance`: Create a default instance.
 
