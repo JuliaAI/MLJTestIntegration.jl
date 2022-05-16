@@ -1,4 +1,6 @@
 Manifest.toml
+/docs/Manifest.toml
+/test/Manifest.toml
 .ipynb_checkpoints
 *~
 #*
@@ -6,5 +8,4 @@ Manifest.toml
 sandbox/
 /docs/build/
 /docs/site/
-/docs/Manifest.toml
 .vscode

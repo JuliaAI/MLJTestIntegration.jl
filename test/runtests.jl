@@ -1,24 +1,25 @@
-using MLJExampleInterface # substitute for correct interface pkg name
 using Test
-using MLJBase
-import Distributions
-using StableRNGs # for RNGs stable across all julia versions
-rng = StableRNGs.StableRNG(123)
+using Pkg
+using MLJTest
+using MLJ
+using MLJModels
 
-@testset "cool classifier" begin
-    n = 100
-    p = 3
-    nclasses = 5
-    X, y = make_blobs(n, p, centers=nclasses, rng=rng);
-    model = MLJExampleInterface.CoolProbabilisticClassifier()
-    mach = machine(model, X, y)
-    fit!(mach, rows=1:2, verbosity=0)
-    yhat = predict(mach, rows=3)
-    @test size(Distributions.pdf(yhat, levels(y)) ) == (1, nclasses)
+# enable conditional testing of modules by providing test_args
+# e.g. `Pkg.test("MLJBase", test_args=["misc"])`
+RUN_ALL_TESTS = isempty(ARGS)
+macro conditional_testset(name, expr)
+    name = string(name)
+    esc(quote
+        if RUN_ALL_TESTS || $name in ARGS
+            @testset $name $expr
+        end
+    end)
+end
 
-    e = evaluate!(mach, measure=BrierLoss(), verbosity=0)
-    @test e.measurement[1] < 1.0
+@conditional_testset "attemptors" begin
+    include("attemptors.jl")
+end
 
-    @test fitted_params(mach).classes_seen_in_training == levels(y)
-    @test report(mach).n_classes_seen == nclasses
+@conditional_testset "test() and relatives" begin
+    include("test.jl")
 end
