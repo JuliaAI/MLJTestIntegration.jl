@@ -16,7 +16,8 @@ Pkg.add("MLJTest")
 # Usage
 
 This package provides a single method for testing a collection of
-`models` (types or MLJ Model Registry entries) using training `data`:
+`models` (types or named tuples with keys `:name` and `:package_name`)
+using the specified training `data`:
 
 ```
 MLJTest.test(models, data...; verbosity=1, mod=Main, loading_only=false) -> failures, summary
