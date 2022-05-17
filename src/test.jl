@@ -82,7 +82,7 @@ regressors = MLJTest.MLJ.models(matching(X, y)) do m
     m.package_name == "GLM"
 end
 failures, summary = MLJTest.test(regressors, X, y, verbosity=1, mod=@__MODULE__)
-summary |> DataFrame 
+summary |> DataFrame
 ```
 
 # List of tests applied
@@ -111,8 +111,9 @@ These additional tests are applied to `Supervised` models:
   and a `Holdout` set.
 
 - `:tuned_pipe_evaluation`: Repeat the `:evauation` test but first
-  insert model in a pipeline with input standardization, and wrap in
-  `TunedModel` (only the default instance is actually evaluated)
+  insert model in a pipeline with a trivial pre-processing step
+  (applies the identity transformation) and wrap in `TunedModel` (only
+  the default instance is actually evaluated)
 
 - Repeat the `:evaluation` test but first wrap as an `EnsembleModel`.
 
@@ -251,7 +252,7 @@ function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
         outcome == "×" && continue
 
         # tuned_pipe_evaluation:
-        tuned_pipe_evaluation =
+        tuned_pipe_evaluation, outcome =
             MLJTest.tuned_pipe_evaluation(measure, model_instance, data...; verbosity)
         row = update(row, i, :tuned_pipe_evaluation, tuned_pipe_evaluation, outcome)
         outcome == "×" && continue

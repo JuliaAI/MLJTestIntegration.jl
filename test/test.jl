@@ -33,7 +33,6 @@ expected_summary2 = (
 )
 
 @testset "test classifiers on valid data (models are proxies)" begin
-
     X, y0 = make_moons();
     y = coerce(y0, OrderedFactor);
 
@@ -55,36 +54,6 @@ end
     @test isempty(fails)
     @test summary[1] == expected_summary1
     @test summary[2] == expected_summary2
-end
-
-@testset "load_only=true" begin
-
-    classifiers = [ConstantClassifier,]
-    X, y0 = make_moons();
-    y = coerce(y0, OrderedFactor);
-
-    fails, summary  =
-        @test_logs MLJTest.test(
-            classifiers,
-            X,
-            y;
-            mod=@__MODULE__,
-            load_only=true,
-            verbosity=0)
-    @test isempty(fails)
-    @test summary[1] == (
-        name = "ConstantClassifier",
-        package = "MLJModels",
-        model_type = "✓",
-        model_instance = "-",
-        fitted_machine = "-",
-        operations = "-",
-        evaluation = "-",
-        tuned_pipe_evaluation = "-",
-        threshold_prediction = "-",
-        ensemble_prediction = "-",
-        iteration_prediction = "-",
-    )
 end
 
 @testset "test classifiers on invalid data" begin
@@ -140,6 +109,86 @@ end
         iteration_prediction = "-"
     )
 
+end
+
+classifiers = [ConstantClassifier,]
+X, y0 = make_moons();
+y = coerce(y0, OrderedFactor);
+
+@testset "verbose logging" begin
+    # progress meter:
+    @test_logs MLJTest.test(
+        fill(classifiers[1], 500),
+        X,
+        y;
+        mod=@__MODULE__,
+        load_only=true,
+        verbosity=1);
+
+    # verbosity high:
+    @test_logs(
+        (:info, r"Testing ConstantClassifier"),
+        (:info, r"model_type"),
+        (:info, r"model_instance"),
+        (:info, r"fitted_machine"),
+        (:info, r"operations"),
+        (:info, r"threshold_predictor"),
+        (:info, r"evaluation"),
+        (:info, r"tuned_pipe_evaluation"),
+        (:info, r"ensemble_prediction"),
+        MLJTest.test(
+            classifiers,
+            X,
+            y;
+            mod=@__MODULE__,
+            verbosity=2)
+    )
+end 
+
+@testset "load_only=true" begin
+
+    fails, summary  =
+        @test_logs MLJTest.test(
+            classifiers,
+            X,
+            y;
+            mod=@__MODULE__,
+            load_only=true,
+            verbosity=0)
+    @test isempty(fails)
+    @test summary[1] == (
+        name = "ConstantClassifier",
+        package = "MLJModels",
+        model_type = "✓",
+        model_instance = "-",
+        fitted_machine = "-",
+        operations = "-",
+        evaluation = "-",
+        tuned_pipe_evaluation = "-",
+        threshold_prediction = "-",
+        ensemble_prediction = "-",
+        iteration_prediction = "-",
+    )
+end
+
+
+@testset "iterative model" begin
+    X, y = MLJTest.make_dummy();
+    fails, summary =
+        MLJTest.test([MLJTest.DummyIterativeModel,], X, y; mod=@__MODULE__, verbosity=0)
+    @test isempty(fails)
+    @test summary[1] == (
+        name = "DummyIterativeModel",
+        package = "MLJTest",
+        model_type = "✓",
+        model_instance = "✓",
+        fitted_machine = "✓",
+        operations = "predict",
+        evaluation = "✓",
+        tuned_pipe_evaluation = "✓",
+        threshold_prediction = "-",
+        ensemble_prediction = "✓",
+        iteration_prediction = "✓",)
 end
 
 # if false

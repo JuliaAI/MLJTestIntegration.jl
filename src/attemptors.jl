@@ -37,40 +37,54 @@ function load_path(proxy::NamedTuple)
     return MLJ.MLJModels.INFO_GIVEN_HANDLE[handle][:load_path]
 end
 
+root(load_path) = split(load_path, '.') |> first
+
 function model_type(proxy, mod; verbosity=1)
     # check interface package really is in current environment:
-    message = "Loading model type "
+    message = "`[:model_type]` Loading model type "
     model_type, outcome = attempt(finalize(message, verbosity)) do
         load_path = MLJTest.load_path(proxy) # MLJ.load_path(proxy) *****
-        path_components = split(load_path, '.')
-        api_pkg_ex = first(path_components) |> Symbol
+        load_path_ex = load_path |> Meta.parse
+        api_pkg_ex = root(load_path) |> Symbol
         import_ex = :(import $api_pkg_ex)
-        path_ex = load_path |> Meta.parse
         quote
             $import_ex
-            $path_ex
+            $load_path_ex
         end |>  mod.eval
     end
 
     # catch case of interface package not in current environment:
-    if outcome == "×" &&
-        model_type isa ArgumentError &&
-        contains(model_type.msg, "not found in current path")
-        throw(model_type)
+    if outcome == "×" && model_type isa ArgumentError
+        # try to get the name of interface package; if this fails we
+        # catch the exception thrown but take no further
+        # action. Otherwise, we test if the original exception caught
+        # above, `model_type`, was triggered because of API package is
+        # missing from in environment.
+        api_pkg = try
+            load_path = MLJTest.load_path(proxy) # MLJ.load_path(proxy) *****
+            api_pkg = root(load_path)
+        catch
+            nothing
+        end
+        if !isnothing(api_pkg) &&
+               api_pkg != "unknown" &&
+               contains(model_type.msg, "$api_pkg not found in")
+            throw(model_type)
+        end
     end
 
     return model_type, outcome
 end
 
 function model_instance(model_type; verbosity=1)
-    message = "Instantiating default model "
+    message = "`[:model_instance]` Instantiating default model "
     attempt(finalize(message, verbosity))  do
         model_type()
     end
 end
 
 function fitted_machine(model, data...; verbosity=1)
-    message = "Fitting machine "
+    message = "`[:fitted_machine]` Fitting machine "
     attempt(finalize(message, verbosity))  do
         mach = machine(model, data...)
         fit!(mach, verbosity=-1)
@@ -78,7 +92,7 @@ function fitted_machine(model, data...; verbosity=1)
 end
 
 function operations(fitted_machine, data...; verbosity=1)
-    message = "Calling `predict`, `transform` and/or `inverse_transform` "
+    message = "`[:operations]` Calling `predict`, `transform` and/or `inverse_transform` "
     attempt(finalize(message, verbosity))  do
         operations = String[]
         methods = MLJ.implemented_methods(fitted_machine.model)
@@ -99,7 +113,8 @@ function operations(fitted_machine, data...; verbosity=1)
 end
 
 function threshold_prediction(model, data...; verbosity=1)
-    message = "Calling fit!/predict for threshold predictor "
+    message = "`[:threshold_predictor]` Calling fit!/predict for threshold predictor "*
+        "test) "
     attempt(finalize(message, verbosity)) do
         tmodel = BinaryThresholdPredictor(model)
         mach = machine(tmodel, data...)
@@ -109,7 +124,7 @@ function threshold_prediction(model, data...; verbosity=1)
 end
 
 function evaluation(measure, model, data...; verbosity=1)
-    message = "Evaluating performance "
+    message = "`[:evaluation]` Evaluating performance "
     attempt(finalize(message, verbosity)) do
         evaluate(model, data...;
                  measure=measure,
@@ -119,9 +134,9 @@ function evaluation(measure, model, data...; verbosity=1)
 end
 
 function tuned_pipe_evaluation(measure, model, data...; verbosity=1)
-    message = "Evaluating perfomance in a tuned pipeline "
+    message = "`[:tuned_pipe_evaluation]` Evaluating perfomance in a tuned pipeline "
     attempt(finalize(message, verbosity)) do
-        pipe = Standardizer() |> model
+        pipe = identity |> model
         tuned_pipe = TunedModel(models=[pipe,],
                                 measure=measure)
         evaluate(tuned_pipe, data...;
@@ -131,7 +146,7 @@ function tuned_pipe_evaluation(measure, model, data...; verbosity=1)
 end
 
 function ensemble_prediction(model, data...; verbosity=1)
-    attempt(finalize("Ensembling ", verbosity)) do
+    attempt(finalize("`[:ensemble_prediction]` Ensembling ", verbosity)) do
         imodel = EnsembleModel(model=model,
                                n=2)
         mach = machine(imodel, data...)
@@ -141,7 +156,7 @@ function ensemble_prediction(model, data...; verbosity=1)
 end
 
 function iteration_prediction(measure, model, data...; verbosity=1)
-    message =  "Iterating with controls "
+    message =  "`[:iteration_prediction]` Iterating with controls "
     attempt(finalize(message, verbosity)) do
         imodel = IteratedModel(model=model,
                                measure=measure,
