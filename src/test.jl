@@ -59,8 +59,9 @@ The following applies the integration tests to a model type
 type:
 
 ```
+import MLJTest
 using Test
-X, y = MLJ.make_blobs()
+X, y = MLJTest.MLJ.make_blobs()
 failures, summary = MLJTest.test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
 @test isempty(failures)
 ```
@@ -73,14 +74,15 @@ GLM.jl models are provided through the interface package
 `MLJGLMInterface`, this must be in the current environment:
 
 ```
-using DataFrames
 Pkg.add("MLJGLMInterface")
-X, y = make_regression();
-regressors = models(matching(X, y)) do m
+import MLJBase, MLJTest
+using DataFrames # to view summary
+X, y = MLJTest.MLJ.make_regression();
+regressors = MLJTest.MLJ.models(matching(X, y)) do m
     m.package_name == "GLM"
 end
 failures, summary = MLJTest.test(regressors, X, y, verbosity=1, mod=@__MODULE__)
-summary |> DataFrame # for better display
+summary |> DataFrame 
 ```
 
 # List of tests applied

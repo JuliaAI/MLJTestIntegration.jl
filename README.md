@@ -17,12 +17,11 @@ Pkg.add("MLJTest")
 
 # Usage
 
-To start using the package, run `using MLJTest`. The package provides
-a single public method, `MLJTest.test`. Query it's document string for
-details.
+This package provides a single method for testing a collection of
+`models` (types or MLJ Model Registry entries) using training `data`:
 
-```julia
-using MLJTest
-@doc MLJTest.test
+```
+MLJTest.test(models, data...; verbosity=1, mod=Main, loading_only=false) -> failures, summary
 ```
 
+See the method document string for details. 
