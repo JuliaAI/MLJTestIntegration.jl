@@ -9,10 +9,8 @@ function next!(p)
     MLJ.ProgressMeter.updateProgress!(p)
 end
 
-
-
 """
-    test(models, data...; verbosity=1, mod=Main, loading_only=false)
+    test(models, data...; mod=Main, level=2, verbosity=1)
 
 Apply a battery of MLJ integration tests to a collection of models,
 using `data` for training. Here `mod` should be the module from which
@@ -30,9 +28,13 @@ using `data` for training. Here `mod` should be the module from which
   interface packages providing the models must be in the current
   environment, but the packages need not be loaded.
 
-Specify `loading_only=true` to only test model loading, as detailed in
-the test called `model_type` below.
+The extent of testing is controlled by `level`:
 
+|`level`          | description                      | tests (full list below) |
+|:----------------|:---------------------------------|:------------------------|
+| 1               | test code loading                | `:model_type`           |
+| 2 (default)     | basic test of model interface    | first four tests        |
+| 3               | comprehensive                    | all applicable tests    |
 
 # Return value
 
@@ -43,18 +45,18 @@ Returns `(failures, summary)` where:
 - `summary`: table summarizing the outcomes of each test, where
   outcomes are indicated as below:
 
-`summary` table entry | interpretation
-----------------------|-----------------
-✓                     | test succesful
-×                     | test unsuccessful
-n/a                   | skipped because not applicable
- -                    | test skipped for some other reason
+| entry | interpretation                     |
+|:------|:-----------------------------------|
+| ✓     | test succesful                     |
+| ×     | test unsuccessful                  |
+| n/a   | skipped because not applicable     |
+| -     | test skipped for some other reason |
 
 # Examples
 
 ## Testing models in a new MLJ model interface implementation
 
-The following applies the integration tests to a model type
+The following tests the model interface implemented by some model type
 `MyClassifier`, as might appear in tests for a package providing that
 type:
 
@@ -68,10 +70,10 @@ failures, summary = MLJTest.test([MyClassifier, ], X, y, verbosity=1, mod=@__MOD
 
 ## Testing models after filtering models in the registry
 
-The following applies integration tests to all regressors provided by
-the package GLM.jl that are also in the MLJ Model Registry. Since
-GLM.jl models are provided through the interface package
-`MLJGLMInterface`, this must be in the current environment:
+The following applies comprehensive integration tests to all
+regressors provided by the package GLM.jl appearing in the MLJ Model
+Registry. Since GLM.jl models are provided through the interface
+package `MLJGLMInterface`, this must be in the current environment:
 
 ```
 Pkg.add("MLJGLMInterface")
@@ -81,11 +83,17 @@ X, y = MLJTest.MLJ.make_regression();
 regressors = MLJTest.MLJ.models(matching(X, y)) do m
     m.package_name == "GLM"
 end
-failures, summary = MLJTest.test(regressors, X, y, verbosity=1, mod=@__MODULE__)
+failures, summary = MLJTest.test(
+    regressors, 
+    X, 
+    y, 
+    verbosity=1, 
+    mod=@__MODULE__,
+    level=3)
 summary |> DataFrame
 ```
 
-# List of tests applied
+# List of tests
 
 Tests are applied in sequence. When a test fails, subsequent tests for
 that model are skipped. The following are applied to all models:
@@ -121,7 +129,7 @@ These additional tests are applied to `Supervised` models:
   but first wrap as an `IteratedModel`.
 
 """
-function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
+function test(model_proxies, data...; verbosity=1, mod=Main, level=2)
 
     nproxies = length(model_proxies)
 
@@ -200,7 +208,7 @@ function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
         row = update(row, i, :model_type, model_type, outcome)
         outcome == "×" && continue
 
-        load_only && continue
+        level > 1 || continue
 
         # model_instance:
         model_instance, outcome =
@@ -225,6 +233,7 @@ function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
             row = update(row, i, :operations, operations, operations)
         end
 
+        level > 2 || continue
         model_instance isa Supervised || continue
 
         # supervised tests:

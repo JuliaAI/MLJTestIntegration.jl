@@ -1,5 +1,3 @@
-str(model_metadata) = "$(model_metadata.name) from $(model_metadata.package_name)"
-
 """
     attempt(f, message="")
 
@@ -11,7 +9,7 @@ If `message` is not empty, then it is logged to `Info`, together with
 the second return value ("✓" or "×").
 
 """
-function attempt(f, message="")
+function attempt(f, message)
     ret = try
         (f(), "✓")
     catch ex
