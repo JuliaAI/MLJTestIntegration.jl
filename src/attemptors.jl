@@ -1,5 +1,5 @@
 """
-    attempt(f, message="")
+    attempt(f, message)
 
 Return `(f(), "✓") if `f()` executes without throwing an
 exception. Otherwise, return `(ex, "×"), where `ex` is the exception
