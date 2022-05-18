@@ -20,7 +20,8 @@ This package provides a single method for testing a collection of
 using the specified training `data`:
 
 ```
-MLJTest.test(models, data...; verbosity=1, mod=Main, loading_only=false) -> failures, summary
+MLJTest.test(models, data...; mod=Main, level=2, throw=false, verbosity=1) 
+    -> failures, summary
 ```
 
 For detailed documentation, run `using MLJTest; @doc MLJTest.test`.
