@@ -130,6 +130,22 @@ end
         iteration_prediction = "-"
     )
 
+    # throw=true:
+    @test_logs(
+        (:error, r""), match_mode=:any,
+        @test_throws(
+            ErrorException,
+            MLJTest.test(
+                classifiers,
+                X,
+                y;
+                mod=@__MODULE__,
+                level=3,
+                throw=true,
+                verbosity=0
+            )
+        )
+    )
 end
 
 classifiers = [ConstantClassifier,]
