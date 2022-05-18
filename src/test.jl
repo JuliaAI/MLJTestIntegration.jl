@@ -65,7 +65,7 @@ The following tests the model interface implemented by some model type
 `MyClassifier`, as might appear in tests for a package providing that
 type:
 
-```
+```julia
 import MLJTest
 using Test
 X, y = MLJTest.MLJ.make_blobs()
@@ -80,7 +80,7 @@ regressors provided by the package GLM.jl appearing in the MLJ Model
 Registry. Since GLM.jl models are provided through the interface
 package `MLJGLMInterface`, this must be in the current environment:
 
-```
+```julia
 Pkg.add("MLJGLMInterface")
 import MLJBase, MLJTest
 using DataFrames # to view summary
