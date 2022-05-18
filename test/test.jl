@@ -37,7 +37,14 @@ expected_summary2 = (
     y = coerce(y0, OrderedFactor);
 
     fails, summary  =
-        @test_logs MLJTest.test(classifiers, X, y; mod=@__MODULE__, verbosity=0)
+        @test_logs MLJTest.test(
+            classifiers,
+            X,
+            y;
+            mod=@__MODULE__,
+            level=3,
+            verbosity=0
+        )
     @test isempty(fails)
     @test summary[1] == expected_summary1
     @test summary[2] == expected_summary2
@@ -50,7 +57,14 @@ end
     y = coerce(y0, OrderedFactor);
 
     fails, summary  =
-        @test_logs MLJTest.test(classifiers, X, y; mod=@__MODULE__, verbosity=0)
+        @test_logs MLJTest.test(
+            classifiers,
+            X,
+            y;
+            mod=@__MODULE__,
+            level=3,
+            verbosity=0
+        )
     @test isempty(fails)
     @test summary[1] == expected_summary1
     @test summary[2] == expected_summary2
@@ -61,7 +75,14 @@ end
     fails, summary = @test_logs(
         (:error, r""),
         match_mode=:any,
-        MLJTest.test(classifiers, X, y; mod=@__MODULE__, verbosity=0)
+        MLJTest.test(
+            classifiers,
+            X,
+            y;
+            mod=@__MODULE__,
+            level=3,
+            verbosity=0
+        )
     )
 
     @test length(fails) === 2
@@ -109,6 +130,22 @@ end
         iteration_prediction = "-"
     )
 
+    # throw=true:
+    @test_logs(
+        (:error, r""), match_mode=:any,
+        @test_throws(
+            ErrorException,
+            MLJTest.test(
+                classifiers,
+                X,
+                y;
+                mod=@__MODULE__,
+                level=3,
+                throw=true,
+                verbosity=0
+            )
+        )
+    )
 end
 
 classifiers = [ConstantClassifier,]
@@ -122,7 +159,7 @@ y = coerce(y0, OrderedFactor);
         X,
         y;
         mod=@__MODULE__,
-        load_only=true,
+        level=1,
         verbosity=1);
 
     # verbosity high:
@@ -141,19 +178,20 @@ y = coerce(y0, OrderedFactor);
             X,
             y;
             mod=@__MODULE__,
+            level=3,
             verbosity=2)
     )
-end 
+end
 
-@testset "load_only=true" begin
-
+@testset "level" begin
+    # level=1:
     fails, summary  =
         @test_logs MLJTest.test(
             classifiers,
             X,
             y;
             mod=@__MODULE__,
-            load_only=true,
+            level=1,
             verbosity=0)
     @test isempty(fails)
     @test summary[1] == (
@@ -169,13 +207,43 @@ end
         ensemble_prediction = "-",
         iteration_prediction = "-",
     )
-end
 
+    # level=2:
+    fails, summary  =
+        @test_logs MLJTest.test(
+            classifiers,
+            X,
+            y;
+            mod=@__MODULE__,
+            level=2,
+            verbosity=0)
+    @test isempty(fails)
+    @test summary[1] == (
+        name = "ConstantClassifier",
+        package = "MLJModels",
+        model_type = "✓",
+        model_instance = "✓",
+        fitted_machine = "✓",
+        operations = "predict",
+        evaluation = "-",
+        tuned_pipe_evaluation = "-",
+        threshold_prediction = "-",
+        ensemble_prediction = "-",
+        iteration_prediction = "-",
+    )
+end
 
 @testset "iterative model" begin
     X, y = MLJTest.make_dummy();
     fails, summary =
-        MLJTest.test([MLJTest.DummyIterativeModel,], X, y; mod=@__MODULE__, verbosity=0)
+        MLJTest.test(
+            [MLJTest.DummyIterativeModel,],
+            X,
+            y;
+            mod=@__MODULE__,
+            level=3,
+            verbosity=0
+        )
     @test isempty(fails)
     @test summary[1] == (
         name = "DummyIterativeModel",

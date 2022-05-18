@@ -19,8 +19,51 @@ This package provides a single method for testing a collection of
 `models` (types or named tuples with keys `:name` and `:package_name`)
 using the specified training `data`:
 
-```
-MLJTest.test(models, data...; verbosity=1, mod=Main, loading_only=false) -> failures, summary
+```julia
+MLJTest.test(models, data...; mod=Main, level=2, throw=false, verbosity=1) 
+    -> failures, summary
 ```
 
-See the method document string for details. 
+For detailed documentation, run `using MLJTest; @doc MLJTest.test`.
+
+
+# Examples
+
+## Testing models in a new MLJ model interface implementation
+
+The following tests the model interface implemented by some model type
+`MyClassifier`, as might appear in tests for a package providing that
+type:
+
+```julia
+import MLJTest
+using Test
+X, y = MLJTest.MLJ.make_blobs()
+failures, summary = MLJTest.test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
+@test isempty(failures)
+```
+
+## Testing models after filtering models in the registry
+
+The following applies comprehensive integration tests to all
+regressors provided by the package GLM.jl appearing in the MLJ Model
+Registry. Since GLM.jl models are provided through the interface
+package `MLJGLMInterface`, this must be in the current environment:
+
+```julia
+Pkg.add("MLJGLMInterface")
+import MLJBase, MLJTest
+using DataFrames # to view summary
+X, y = MLJTest.MLJ.make_regression();
+regressors = MLJTest.MLJ.models(matching(X, y)) do m
+    m.package_name == "GLM"
+end
+failures, summary = MLJTest.test(
+    regressors, 
+    X, 
+    y, 
+    verbosity=1, 
+    mod=@__MODULE__,
+    level=3)
+summary |> DataFrame
+```
