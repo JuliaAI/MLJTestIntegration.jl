@@ -17,14 +17,19 @@ using `data` for training. Here `mod` should be the module from which
 `test` is called (generally, `mod=@__MODULE__` will work). Here
 `models` is either:
 
-- A collection of model types. These types must already be loaded into
-  `mod`.
+1. A collection of model types implementing the [MLJ model
+interface](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/).
 
-- A collection of named tuples, where each tuple includes `:name` and
+2. A collection of named tuples, where each tuple includes `:name` and
   `:package_name` as keys, and whose corresponding values point to a
-  model in the [MLJ Model
+  model types appearing in the [MLJ Model
   Registry](https://github.com/JuliaAI/MLJModels.jl/tree/dev/src/registry).
-  `MLJ.models(...)` always returns such a collection. The
+  `MLJ.models(...)` always returns such a collection.
+
+Ordinarily, code defining the model types to be tested must already be
+loaded into the module `mod`. An exception is described under "Testing
+with automatic code loading" below.
+
   interface packages providing the models must be in the current
   environment, but the packages need not be loaded.
 
@@ -57,6 +62,16 @@ Returns `(failures, summary)` where:
 | n/a   | skipped because not applicable     |
 | -     | test skipped for some other reason |
 
+# Testing with automatic code loading
+
+World Age issues pose challenges for testing Julia code if some code
+is to be loaded "on demand". Nevertheless, in case 2 mentioned above,
+model types to be tested need not be loaded, provided testing is
+carried out in two stages, as shown in the second example below. In
+this case, however, the necessary model interface packages need
+to be listed in the current Julia environment, and the `test` calls
+must appear in global scope.
+
 # Examples
 
 ## Testing models in a new MLJ model interface implementation
@@ -88,13 +103,14 @@ X, y = MLJTest.MLJ.make_regression();
 regressors = MLJTest.MLJ.models(matching(X, y)) do m
     m.package_name == "GLM"
 end
-failures, summary = MLJTest.test(
-    regressors, 
-    X, 
-    y, 
-    verbosity=1, 
-    mod=@__MODULE__,
-    level=3)
+
+# to test code loading *and* load code:
+MLJTest.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=1)
+
+# comprehensive tests:
+failures, summary =
+    MLJTest.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=1)
+
 summary |> DataFrame
 ```
 
@@ -178,7 +194,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         if outcome == "×"
             failures_row = (
                 ; name=row.name,
-                package=row.package,
+                package_name=row.package,
                 test=string(test),
                 exception=value_or_exception
             )
