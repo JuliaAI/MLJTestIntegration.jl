@@ -58,12 +58,13 @@ X, y = MLJTest.MLJ.make_regression();
 regressors = MLJTest.MLJ.models(matching(X, y)) do m
     m.package_name == "GLM"
 end
-failures, summary = MLJTest.test(
-    regressors, 
-    X, 
-    y, 
-    verbosity=1, 
-    mod=@__MODULE__,
-    level=3)
+
+# to test code loading *and* load code:
+MLJTest.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=1)
+
+# comprehensive tests:
+failures, summary =
+    MLJTest.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=1)
+
 summary |> DataFrame
 ```
