@@ -41,7 +41,7 @@ root(load_path) = split(load_path, '.') |> first
 
 function model_type(proxy, mod; throw=false, verbosity=1)
     # check interface package really is in current environment:
-    message = "`[:model_type]` Loading model type "
+    message = "[:model_type] Loading model type "
     model_type, outcome = attempt(finalize(message, verbosity); throw) do
         load_path = MLJTest.load_path(proxy) # MLJ.load_path(proxy) *****
         load_path_ex = load_path |> Meta.parse
@@ -77,14 +77,14 @@ function model_type(proxy, mod; throw=false, verbosity=1)
 end
 
 function model_instance(model_type; throw=false, verbosity=1)
-    message = "`[:model_instance]` Instantiating default model "
+    message = "[:model_instance] Instantiating default model "
     attempt(finalize(message, verbosity); throw)  do
         model_type()
     end
 end
 
 function fitted_machine(model, data...; throw=false, verbosity=1)
-    message = "`[:fitted_machine]` Fitting machine "
+    message = "[:fitted_machine] Fitting machine "
     attempt(finalize(message, verbosity); throw)  do
         mach = machine(model, data...)
         fit!(mach, verbosity=-1)
@@ -92,7 +92,7 @@ function fitted_machine(model, data...; throw=false, verbosity=1)
 end
 
 function operations(fitted_machine, data...; throw=false, verbosity=1)
-    message = "`[:operations]` Calling `predict`, `transform` and/or `inverse_transform` "
+    message = "[:operations] Calling `predict`, `transform` and/or `inverse_transform` "
     attempt(finalize(message, verbosity); throw)  do
         operations = String[]
         methods = MLJ.implemented_methods(fitted_machine.model)
@@ -113,7 +113,7 @@ function operations(fitted_machine, data...; throw=false, verbosity=1)
 end
 
 function threshold_prediction(model, data...; throw=false, verbosity=1)
-    message = "`[:threshold_predictor]` Calling fit!/predict for threshold predictor "*
+    message = "[:threshold_predictor] Calling fit!/predict for threshold predictor "*
         "test) "
     attempt(finalize(message, verbosity); throw) do
         tmodel = BinaryThresholdPredictor(model)
@@ -124,7 +124,7 @@ function threshold_prediction(model, data...; throw=false, verbosity=1)
 end
 
 function evaluation(measure, model, data...; throw=false, verbosity=1)
-    message = "`[:evaluation]` Evaluating performance "
+    message = "[:evaluation] Evaluating performance "
     attempt(finalize(message, verbosity); throw) do
         evaluate(model, data...;
                  measure=measure,
@@ -134,7 +134,7 @@ function evaluation(measure, model, data...; throw=false, verbosity=1)
 end
 
 function tuned_pipe_evaluation(measure, model, data...; throw=false, verbosity=1)
-    message = "`[:tuned_pipe_evaluation]` Evaluating perfomance in a tuned pipeline "
+    message = "[:tuned_pipe_evaluation] Evaluating perfomance in a tuned pipeline "
     attempt(finalize(message, verbosity); throw) do
         pipe = identity |> model
         tuned_pipe = TunedModel(models=[pipe,],
@@ -146,7 +146,7 @@ function tuned_pipe_evaluation(measure, model, data...; throw=false, verbosity=1
 end
 
 function ensemble_prediction(model, data...; throw=false, verbosity=1)
-    attempt(finalize("`[:ensemble_prediction]` Ensembling ", verbosity); throw) do
+    attempt(finalize("[:ensemble_prediction] Ensembling ", verbosity); throw) do
         imodel = EnsembleModel(model=model,
                                n=2)
         mach = machine(imodel, data...)
@@ -156,7 +156,7 @@ function ensemble_prediction(model, data...; throw=false, verbosity=1)
 end
 
 function iteration_prediction(measure, model, data...; throw=false, verbosity=1)
-    message =  "`[:iteration_prediction]` Iterating with controls "
+    message =  "[:iteration_prediction] Iterating with controls "
     attempt(finalize(message, verbosity); throw) do
         imodel = IteratedModel(model=model,
                                measure=measure,
