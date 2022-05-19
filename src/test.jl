@@ -155,10 +155,10 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
     nproxies = length(model_proxies)
 
     # initiate return objects:
-    failures = NamedTuple{(:name, :package, :test, :exception), NTuple{4, Any}}[]
+    failures = NamedTuple{(:name, :package_name, :test, :exception), NTuple{4, Any}}[]
     summary = Vector{NamedTuple{(
         :name,
-        :package,
+        :package_name,
         :model_type,
         :model_instance,
         :fitted_machine,
@@ -173,7 +173,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
     # summary table row corresponding to all tests skipped:
     row0 = (
         ; name="undefined",
-        package= "undefined",
+        package_name= "undefined",
         model_type = "-",
         model_instance = "-",
         fitted_machine = "-",
@@ -194,7 +194,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         if outcome == "×"
             failures_row = (
                 ; name=row.name,
-                package_name=row.package,
+                package_name=row.package_name,
                 test=string(test),
                 exception=value_or_exception
             )
@@ -217,12 +217,12 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
 
         verbosity == 1 && next!(meter)
 
-        package = _package_name(model_proxy)
+        package_name = _package_name(model_proxy)
         name = _name(model_proxy)
 
-        verbosity > 1 && @info "\nTesting $name from $package"
+        verbosity > 1 && @info "\nTesting $name from $package_name"
 
-        row = merge(row0, (; name, package))
+        row = merge(row0, (; name, package_name))
 
         # model_type:
         model_type, outcome = MLJTest.model_type(model_proxy, mod; throw, verbosity)

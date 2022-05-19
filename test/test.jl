@@ -6,7 +6,7 @@ classifiers = [
 
 expected_summary1 = (
     name = "ConstantClassifier",
-    package = "MLJModels",
+    package_name = "MLJModels",
     model_type = "✓",
     model_instance = "✓",
     fitted_machine = "✓",
@@ -20,7 +20,7 @@ expected_summary1 = (
 
 expected_summary2 = (
     name = "DeterministicConstantClassifier",
-    package = "MLJModels",
+    package_name = "MLJModels",
     model_type = "✓",
     model_instance = "✓",
     fitted_machine = "✓",
@@ -89,7 +89,7 @@ end
     @test fails[1].exception isa ErrorException
     @test merge(fails[1], (; exception="")) == (
         name = "ConstantClassifier",
-        package = "MLJModels",
+        package_name = "MLJModels",
         test = "fitted_machine",
         exception = ""
     )
@@ -97,14 +97,14 @@ end
     @test fails[2].exception isa ArgumentError
     @test merge(fails[2], (; exception="")) == (
         name = "DeterministicConstantClassifier",
-        package = "MLJModels",
+        package_name = "MLJModels",
         test = "evaluation",
         exception = ""
     )
 
     @test summary[1] == (
         name = "ConstantClassifier",
-        package = "MLJModels",
+        package_name = "MLJModels",
         model_type = "✓",
         model_instance = "✓",
         fitted_machine = "×",
@@ -118,7 +118,7 @@ end
 
     @test summary[2] == (
         name = "DeterministicConstantClassifier",
-        package = "MLJModels",
+        package_name = "MLJModels",
         model_type = "✓",
         model_instance = "✓",
         fitted_machine = "✓",
@@ -196,7 +196,7 @@ end
     @test isempty(fails)
     @test summary[1] == (
         name = "ConstantClassifier",
-        package = "MLJModels",
+        package_name = "MLJModels",
         model_type = "✓",
         model_instance = "-",
         fitted_machine = "-",
@@ -220,7 +220,7 @@ end
     @test isempty(fails)
     @test summary[1] == (
         name = "ConstantClassifier",
-        package = "MLJModels",
+        package_name = "MLJModels",
         model_type = "✓",
         model_instance = "✓",
         fitted_machine = "✓",
@@ -247,7 +247,7 @@ end
     @test isempty(fails)
     @test summary[1] == (
         name = "DummyIterativeModel",
-        package = "MLJTest",
+        package_name = "MLJTest",
         model_type = "✓",
         model_instance = "✓",
         fitted_machine = "✓",
@@ -258,78 +258,3 @@ end
         ensemble_prediction = "✓",
         iteration_prediction = "✓",)
 end
-
-# if false
-
-# if false
-#     MLJModels.activate_registry_environment()
-#     Pkg.instantiate()
-# else
-#     Pkg.activate(temp=true)
-#     Pkg.add("MLJDecisionTreeInterface")
-#     Pkg.instantiate()
-# end
-
-# # pre-load all model types (needed to avoid "alternative world"
-# # conflicts and other weird stuff)
-
-# verbosity = 0
-
-# @info "Loading all model types..."
-# for model_metadata in models(m->m.package_name == "DecisionTree")
-#     MLJTest.model_type(model_metadata, verbosity=verbosity)
-# end
-
-# # ## Grab data and define some collections of models
-
-# # supervised models with a single binary target, excluding supervised
-# # outlier detectors:
-# const X, y0 = make_moons();
-# const y = coerce(y0, OrderedFactor)
-# const classifiers = models(matching(X, y)) do m
-#     !(m.abstract_type <: MLJ.MLJBase.SupervisedAnnotator) &&
-#         package_name == "DecisionTree"
-# end
-
-# # supervised models with a single `Continuous` target:
-# const X2, y2 = make_regression();
-# const regressors = models(matching(X2, y2)) do m
-#     package_name == "DecisionTree"
-# end
-
-# if false
-#     # supervised models with a single `Count` target
-#     const count_regressors = models(matching(X, eachindex(y)))
-
-#     # unsupervised models, excluding some outlier detectors
-#     const transformers = models(matching(X)) do m
-#         m.package_name != "OutlierDetectionPython"
-#     end
-# end
-
-# # ## run the tests
-
-# classifier_fails, t1 = MLJTest.test(classifiers, X, y; verbosity);
-# regressor_fails, t2 = MLJTest.test(regressors, X2, y2; verbosity);
-# if false
-#     transformer_fails, t3 = MLJTest.test(transformers, X; verbosity);
-# end
-# if false
-#     count_regressor_fails, t4 =
-#         MLJTest.test(count_regressors[1:2], X,
-#                                  rand([1, 2, 3], length(y)); verbosity);
-# end
-
-# #-
-# if false
-
-# untested_models =
-#     setdiff(models(), union(classifiers, regressors, count_regressors, transformers))
-
-# end
-
-# @test classifier_fails |> isempty
-
-# end
-
-# true
