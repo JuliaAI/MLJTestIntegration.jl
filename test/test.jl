@@ -1,4 +1,3 @@
-# grab some classifiers from MLJModels:
 classifiers = [
     (name = "ConstantClassifier", package_name = "MLJModels"),
     (name = "DeterministicConstantClassifier", package_name = "MLJModels")

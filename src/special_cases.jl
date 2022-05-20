@@ -1,25 +1,31 @@
 # # HELPERS
 
-_strip(proxy) = (name=proxy.name, package_name=proxy.package_name)
+function warn_not_testing_these(models)
+    "Not testing the following models, as incompatible with testing data:\n"*
+        "$models"
+end
 
-function _filter(proxies, bad)
-    sbad = _strip.(bad)
-    filter(proxies) do proxy
-        !(_strip(proxy) in sbad)
+strip(proxy) = (name=proxy.name, package_name=proxy.package_name)
+
+function actual_proxies(raw_proxies, data, ignore, verbosity)
+    proxies = strip.(raw_proxies)
+    from_registry = strip.(models(matching(data...)))
+    if ignore
+        actual_proxies = setdiff(from_registry, proxies)
+    else
+        actual_proxies = intersect(proxies, from_registry)
+        rejected = setdiff(proxies, actual_proxies)
+        if !isempty(rejected) && verbosity > 0
+            @warn warn_not_testing_these(rejected)
+        end
     end
+    return actual_proxies
 end
 
-# fallback:
-function _test(data, ignore; kwargs...)
-    proxies = _filter(models(matching(data...)), ignore)
-    test(proxies, data...; kwargs...)
+function _test(proxies, data; ignore::Bool=false, verbosity=1, kwargs...)
+    test(actual_proxies(proxies, data, ignore, verbosity), data...; kwargs...)
 end
-
-# when there are no models to exclude:
-function _test(data, ignore::Nothing; kwargs...)
-    proxies = models(matching(data...))
-    test(proxies, data...; kwargs...)
-end
+_test(data; ignore=true, kwargs...) = _test([], data; ignore, kwargs...)
 
 
 # # SINGLE TARGET CLASSIFICATION
@@ -31,8 +37,8 @@ function _make_binary()
     return X, y
 end
 
-test_single_target_classifiers(; ignore=nothing, kwargs...) =
-    _test(_make_binary(), ignore; kwargs...)
+test_single_target_classifiers(args...; kwargs...) =
+    _test(args..., _make_binary(); kwargs...)
 
 
 # # SINGLE TARGET REGRESSION
@@ -43,8 +49,8 @@ function _make_baby_boston()
     return X, y
 end
 
-test_single_target_regressors(; ignore=nothing, kwargs...) =
-    _test(_make_baby_boston(), ignore; kwargs...)
+test_single_target_regressors(args...; kwargs...) =
+    _test(args..., _make_baby_boston(); kwargs...)
 
 
 # # SINGLE TARGET COUNT REGRESSORS
@@ -55,13 +61,13 @@ function _make_count()
     return X, y
 end
 
-test_single_target_count_regressors(; ignore=nothing, kwargs...) =
-    _test(_make_count(), ignore; kwargs...)
+test_single_target_count_regressors(args...; kwargs...) =
+    _test(args..., _make_count(); kwargs...)
 
 
 # # CONTINUOUS TABLE TRANSFORMERS
 
 _make_transformer() = (first(_make_baby_boston()),)
 
-test_continuous_table_transformers(; ingore=nothing, kwargs...) =
-    _test(_make_transformer(), ignore; kwargs...)
+test_continuous_table_transformers(args...; kwargs...) =
+    _test(args..., _make_transformer(); kwargs...)

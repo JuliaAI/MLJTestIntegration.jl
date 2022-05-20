@@ -15,7 +15,7 @@ using DataFrames # for displaying tables
 
 # # Regression
 
-known_issues = models() do model
+known_problems = models() do model
     any([
         # https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29
         model.package_name == "PartialLeastSquaresRegressor",
@@ -25,25 +25,41 @@ known_issues = models() do model
     ])
 end
 
-MLJTestIntegration.test_single_target_regressors(ignore=known_issues, level=1)
-fails, summary =
-    MLJTestIntegration.test_single_target_regressors(ignore=known_issues, level=3)
+MLJTestIntegration.test_single_target_regressors(
+    known_problems,
+    ignore=true,
+    level=1
+)
+
+fails, report =
+    MLJTestIntegration.test_single_target_regressors(
+        known_problems,
+        ignore=true,
+        level=3
+    )
 
 @test isempty(fails)
-summary |> DataFrame
+report |> DataFrame
 
 
 # # Classification
 
 # https://github.com/alan-turing-institute/MLJ.jl/issues/939
-known_issues = [
+known_problems = [
     (name = "DecisionTreeClassifier", package_name="BetaML"),
+    (name = "PerceptronClassifier", package_name="BetaML"),
     (name = "NuSVC", package_name="LIBSVM"),
     (name="PegasosClassifier", package_name="BetaML"),
     (name="RandomForestClassifier", package_name="BetaML"),
     (name="SVMNuClassifier", package_name="ScikitLearn"),
 ]
 
-MLJTestIntegration.test_single_target_classifiers(ignore=known_issues, level=1)
-fails, summary =
-    MLJTestIntegration.test_single_target_classifiers(ignore=known_issues, level=3)
+MLJTestIntegration.test_single_target_classifiers(
+    known_problems,
+    level=1
+)
+fails, report =
+    MLJTestIntegration.test_single_target_classifiers(
+        known_problems,
+        level=3,
+    )
