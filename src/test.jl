@@ -9,30 +9,42 @@ function next!(p)
     MLJ.ProgressMeter.updateProgress!(p)
 end
 
-
-
 """
-    test(models, data...; verbosity=1, mod=Main, loading_only=false)
+    test(models, data...; mod=Main, level=2, throw=false, verbosity=1)
 
 Apply a battery of MLJ integration tests to a collection of models,
 using `data` for training. Here `mod` should be the module from which
 `test` is called (generally, `mod=@__MODULE__` will work). Here
 `models` is either:
 
-- A collection of model types. These types must already be loaded into
-  `mod`.
+1. A collection of model types implementing the [MLJ model
+interface](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/).
 
-- A collection of named tuples, where each tuple includes `:name` and
+2. A collection of named tuples, where each tuple includes `:name` and
   `:package_name` as keys, and whose corresponding values point to a
-  model in the [MLJ Model
+  model types appearing in the [MLJ Model
   Registry](https://github.com/JuliaAI/MLJModels.jl/tree/dev/src/registry).
-  `MLJ.models(...)` always returns such a collection. The
+  `MLJ.models(...)` always returns such a collection.
+
+Ordinarily, code defining the model types to be tested must already be
+loaded into the module `mod`. An exception is described under "Testing
+with automatic code loading" below.
+
   interface packages providing the models must be in the current
   environment, but the packages need not be loaded.
 
-Specify `loading_only=true` to only test model loading, as detailed in
-the test called `model_type` below.
+The extent of testing is controlled by `level`:
 
+|`level`          | description                      | tests (full list below) |
+|:----------------|:---------------------------------|:------------------------|
+| 1               | test code loading                | `:model_type`           |
+| 2 (default)     | basic test of model interface    | first four tests        |
+| 3               | comprehensive                    | all applicable tests    |
+
+By default, exceptions caught in tests are not thrown. If
+`throw=true`, testing will terminate at the first execption
+encountered, after throwing that exception (useful to obtain stack
+traces).
 
 # Return value
 
@@ -43,49 +55,66 @@ Returns `(failures, summary)` where:
 - `summary`: table summarizing the outcomes of each test, where
   outcomes are indicated as below:
 
-`summary` table entry | interpretation
-----------------------|-----------------
-✓                     | test succesful
-×                     | test unsuccessful
-n/a                   | skipped because not applicable
- -                    | test skipped for some other reason
+| entry | interpretation                     |
+|:------|:-----------------------------------|
+| ✓     | test succesful                     |
+| ×     | test unsuccessful                  |
+| n/a   | skipped because not applicable     |
+| -     | test skipped for some other reason |
+
+# Testing with automatic code loading
+
+World Age issues pose challenges for testing Julia code if some code
+is to be loaded "on demand". Nevertheless, in case 2 mentioned above,
+model types to be tested need not be loaded, provided testing is
+carried out in two stages, as shown in the second example below. In
+this case, however, the necessary model interface packages need
+to be listed in the current Julia environment, and the `test` calls
+must appear in global scope.
 
 # Examples
 
 ## Testing models in a new MLJ model interface implementation
 
-The following applies the integration tests to a model type
+The following tests the model interface implemented by some model type
 `MyClassifier`, as might appear in tests for a package providing that
 type:
 
-```
-import MLJTest
+```julia
+import MLJTestIntegration
 using Test
-X, y = MLJTest.MLJ.make_blobs()
-failures, summary = MLJTest.test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
+X, y = MLJTestIntegration.MLJ.make_blobs()
+failures, summary = MLJTestIntegration.test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
 @test isempty(failures)
 ```
 
 ## Testing models after filtering models in the registry
 
-The following applies integration tests to all regressors provided by
-the package GLM.jl that are also in the MLJ Model Registry. Since
-GLM.jl models are provided through the interface package
-`MLJGLMInterface`, this must be in the current environment:
+The following applies comprehensive integration tests to all
+regressors provided by the package GLM.jl appearing in the MLJ Model
+Registry. Since GLM.jl models are provided through the interface
+package `MLJGLMInterface`, this must be in the current environment:
 
-```
+```julia
 Pkg.add("MLJGLMInterface")
-import MLJBase, MLJTest
+import MLJBase, MLJTestIntegration
 using DataFrames # to view summary
-X, y = MLJTest.MLJ.make_regression();
-regressors = MLJTest.MLJ.models(matching(X, y)) do m
+X, y = MLJTestIntegration.MLJ.make_regression();
+regressors = MLJTestIntegration.MLJ.models(matching(X, y)) do m
     m.package_name == "GLM"
 end
-failures, summary = MLJTest.test(regressors, X, y, verbosity=1, mod=@__MODULE__)
+
+# to test code loading *and* load code:
+MLJTestIntegration.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=1)
+
+# comprehensive tests:
+failures, summary =
+    MLJTestIntegration.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=1)
+
 summary |> DataFrame
 ```
 
-# List of tests applied
+# List of tests
 
 Tests are applied in sequence. When a test fails, subsequent tests for
 that model are skipped. The following are applied to all models:
@@ -121,15 +150,15 @@ These additional tests are applied to `Supervised` models:
   but first wrap as an `IteratedModel`.
 
 """
-function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
+function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=1,)
 
     nproxies = length(model_proxies)
 
     # initiate return objects:
-    failures = NamedTuple{(:name, :package, :test, :exception), NTuple{4, Any}}[]
+    failures = NamedTuple{(:name, :package_name, :test, :exception), NTuple{4, Any}}[]
     summary = Vector{NamedTuple{(
         :name,
-        :package,
+        :package_name,
         :model_type,
         :model_instance,
         :fitted_machine,
@@ -144,7 +173,7 @@ function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
     # summary table row corresponding to all tests skipped:
     row0 = (
         ; name="undefined",
-        package= "undefined",
+        package_name= "undefined",
         model_type = "-",
         model_instance = "-",
         fitted_machine = "-",
@@ -165,7 +194,7 @@ function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
         if outcome == "×"
             failures_row = (
                 ; name=row.name,
-                package=row.package,
+                package_name=row.package_name,
                 test=string(test),
                 exception=value_or_exception
             )
@@ -188,35 +217,35 @@ function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
 
         verbosity == 1 && next!(meter)
 
-        package = _package_name(model_proxy)
+        package_name = _package_name(model_proxy)
         name = _name(model_proxy)
 
-        verbosity > 1 && @info "\nTesting $name from $package"
+        verbosity > 1 && @info "\nTesting $name from $package_name"
 
-        row = merge(row0, (; name, package))
+        row = merge(row0, (; name, package_name))
 
         # model_type:
-        model_type, outcome = MLJTest.model_type(model_proxy, mod; verbosity)
+        model_type, outcome = MLJTestIntegration.model_type(model_proxy, mod; throw, verbosity)
         row = update(row, i, :model_type, model_type, outcome)
         outcome == "×" && continue
 
-        load_only && continue
+        level > 1 || continue
 
         # model_instance:
         model_instance, outcome =
-            MLJTest.model_instance(model_type; verbosity)
+            MLJTestIntegration.model_instance(model_type; throw, verbosity)
         row = update(row, i, :model_instance, model_instance, outcome)
         outcome == "×" && continue
 
         # fitted_machine:
         fitted_machine, outcome =
-            MLJTest.fitted_machine(model_instance, data...; verbosity)
+            MLJTestIntegration.fitted_machine(model_instance, data...; throw, verbosity)
         row = update(row, i, :fitted_machine, fitted_machine, outcome)
         outcome == "×" && continue
 
         # operations:
         operations, outcome =
-            MLJTest.operations(fitted_machine, data...; verbosity)
+            MLJTestIntegration.operations(fitted_machine, data...; throw, verbosity)
         # special treatment to get list of operations in `summary`:
         if operations == "×"
             row = update(row, i, :operations, operations, outcome)
@@ -225,6 +254,7 @@ function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
             row = update(row, i, :operations, operations, operations)
         end
 
+        level > 2 || continue
         model_instance isa Supervised || continue
 
         # supervised tests:
@@ -236,7 +266,7 @@ function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
             scitype(data[2]) <: AbstractVector{<:Finite{2}}
 
             threshold_prediction, outcome =
-                MLJTest.threshold_prediction(model_instance, data...; verbosity)
+                MLJTestIntegration.threshold_prediction(model_instance, data...; throw, verbosity)
             row = update(row, i, :threshold_prediction, threshold_prediction, outcome)
             outcome == "×" && continue
         end
@@ -247,19 +277,25 @@ function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
 
         # evaluation:
         evaluation, outcome =
-            MLJTest.evaluation(measure, model_instance, data...; verbosity)
+            MLJTestIntegration.evaluation(measure, model_instance, data...; throw, verbosity)
         row = update(row, i, :evaluation, evaluation, outcome)
         outcome == "×" && continue
 
         # tuned_pipe_evaluation:
         tuned_pipe_evaluation, outcome =
-            MLJTest.tuned_pipe_evaluation(measure, model_instance, data...; verbosity)
+            MLJTestIntegration.tuned_pipe_evaluation(
+                measure,
+                model_instance,
+                data...;
+                throw,
+                verbosity
+            )
         row = update(row, i, :tuned_pipe_evaluation, tuned_pipe_evaluation, outcome)
         outcome == "×" && continue
 
         # ensemble_prediction:
         ensemble_prediction, outcome =
-            MLJTest.ensemble_prediction(model_instance, data...; verbosity)
+            MLJTestIntegration.ensemble_prediction(model_instance, data...; throw, verbosity)
         row = update(row, i, :ensemble_prediction, ensemble_prediction, outcome)
         outcome == "×" && continue
 
@@ -267,7 +303,7 @@ function test(model_proxies, data...; verbosity=1, mod=Main, load_only=false)
 
         # iteration prediction:
         iteration_prediction, outcome =
-            MLJTest.iteration_prediction(measure, model_instance, data...; verbosity)
+            MLJTestIntegration.iteration_prediction(measure, model_instance, data...; throw, verbosity)
         row = update(row, i, :iteration_prediction, iteration_prediction, outcome)
         outcome == "×" && continue
     end

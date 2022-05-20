@@ -1,4 +1,4 @@
-name = "MLJTest"
+name = "MLJTestIntegration"
 uuid = "697918b4-fdc1-4f9e-8ff9-929724cee270"
 authors = ["Anthony D. Blaom <anthony.blaom@gmail.com>"]
 version = "0.1.0"
