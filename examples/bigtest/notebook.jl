@@ -12,7 +12,7 @@ using MLJModels
 using Test
 using DataFrames # for displaying tables
 
-if false
+
 # # Regression
 
 known_issues = models() do model
@@ -38,7 +38,6 @@ end
 
 # https://github.com/alan-turing-institute/MLJ.jl/issues/939
 known_issues = [
-    #
     (name = "DecisionTreeClassifier", package_name="BetaML"),
     (name = "NuSVC", package_name="LIBSVM"),
     (name="PegasosClassifier", package_name="BetaML"),
