@@ -31,15 +31,18 @@ MLJTestIntegration.test_single_target_regressors(
     level=1
 )
 
-fails, report =
+fails1, report1 =
     MLJTestIntegration.test_single_target_regressors(
         known_problems,
         ignore=true,
         level=3
     )
 
-@test isempty(fails)
-report |> DataFrame
+fails1 |> DataFrame
+
+#-
+
+report1 |> DataFrame
 
 
 # # Classification
@@ -56,10 +59,18 @@ known_problems = [
 
 MLJTestIntegration.test_single_target_classifiers(
     known_problems,
-    level=1
+    level=1,
+    ignore=true,
 )
-fails, report =
+fails2, report2 =
     MLJTestIntegration.test_single_target_classifiers(
         known_problems,
+        ignore=true,
         level=3,
     )
+
+fails2 |> DataFrame
+
+#-
+
+report2 |> DataFrame
