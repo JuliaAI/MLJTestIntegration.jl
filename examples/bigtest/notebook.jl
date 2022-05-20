@@ -31,7 +31,6 @@ fails, summary =
 
 @test isempty(fails)
 summary |> DataFrame
-end
 
 
 # # Classification
