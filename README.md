@@ -1,16 +1,16 @@
-# MLJTest.jl
+# MLJTestIntegration.jl
 
 Package for applying integration tests to models implementing the
 [MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/) model
 interface.
 
-[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md) [![Build Status](https://github.com/JuliaAI/MLJTest.jl/workflows/CI/badge.svg)](https://github.com/JuliaAI/MLJTest.jl/actions) [![Coverage](https://codecov.io/gh/JuliaAI/MLJTest.jl/branch/master/graph/badge.svg)](https://codecov.io/github/JuliaAI/MLJTest.jl?branch=master) 
+[![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md) [![Build Status](https://github.com/JuliaAI/MLJTestIntegration.jl/workflows/CI/badge.svg)](https://github.com/JuliaAI/MLJTestIntegration.jl/actions) [![Coverage](https://codecov.io/gh/JuliaAI/MLJTestIntegration.jl/branch/master/graph/badge.svg)](https://codecov.io/github/JuliaAI/MLJTestIntegration.jl?branch=master) 
 
 # Installation
 
 ```julia
 using Pkg
-Pkg.add("MLJTest")
+Pkg.add("MLJTestIntegration")
 ```
 
 # Usage
@@ -20,11 +20,11 @@ This package provides a single method for testing a collection of
 using the specified training `data`:
 
 ```julia
-MLJTest.test(models, data...; mod=Main, level=2, throw=false, verbosity=1) 
+MLJTestIntegration.test(models, data...; mod=Main, level=2, throw=false, verbosity=1) 
     -> failures, summary
 ```
 
-For detailed documentation, run `using MLJTest; @doc MLJTest.test`.
+For detailed documentation, run `using MLJTestIntegration; @doc MLJTestIntegration.test`.
 
 
 # Examples
@@ -36,10 +36,10 @@ The following tests the model interface implemented by some model type
 type:
 
 ```julia
-import MLJTest
+import MLJTestIntegration
 using Test
-X, y = MLJTest.MLJ.make_blobs()
-failures, summary = MLJTest.test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
+X, y = MLJTestIntegration.MLJ.make_blobs()
+failures, summary = MLJTestIntegration.test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
 @test isempty(failures)
 ```
 
@@ -52,19 +52,19 @@ package `MLJGLMInterface`, this must be in the current environment:
 
 ```julia
 Pkg.add("MLJGLMInterface")
-import MLJBase, MLJTest
+import MLJBase, MLJTestIntegration
 using DataFrames # to view summary
-X, y = MLJTest.MLJ.make_regression();
-regressors = MLJTest.MLJ.models(matching(X, y)) do m
+X, y = MLJTestIntegration.MLJ.make_regression();
+regressors = MLJTestIntegration.MLJ.models(matching(X, y)) do m
     m.package_name == "GLM"
 end
 
 # to test code loading *and* load code:
-MLJTest.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=1)
+MLJTestIntegration.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=1)
 
 # comprehensive tests:
 failures, summary =
-    MLJTest.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=1)
+    MLJTestIntegration.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=1)
 
 summary |> DataFrame
 ```
