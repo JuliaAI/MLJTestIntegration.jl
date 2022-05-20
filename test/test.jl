@@ -37,7 +37,7 @@ expected_summary2 = (
     y = coerce(y0, OrderedFactor);
 
     fails, summary  =
-        @test_logs MLJTest.test(
+        @test_logs MLJTestIntegration.test(
             classifiers,
             X,
             y;
@@ -57,7 +57,7 @@ end
     y = coerce(y0, OrderedFactor);
 
     fails, summary  =
-        @test_logs MLJTest.test(
+        @test_logs MLJTestIntegration.test(
             classifiers,
             X,
             y;
@@ -75,7 +75,7 @@ end
     fails, summary = @test_logs(
         (:error, r""),
         match_mode=:any,
-        MLJTest.test(
+        MLJTestIntegration.test(
             classifiers,
             X,
             y;
@@ -135,7 +135,7 @@ end
         (:error, r""), match_mode=:any,
         @test_throws(
             ErrorException,
-            MLJTest.test(
+            MLJTestIntegration.test(
                 classifiers,
                 X,
                 y;
@@ -154,7 +154,7 @@ y = coerce(y0, OrderedFactor);
 
 @testset "verbose logging" begin
     # progress meter:
-    @test_logs MLJTest.test(
+    @test_logs MLJTestIntegration.test(
         fill(classifiers[1], 500),
         X,
         y;
@@ -173,7 +173,7 @@ y = coerce(y0, OrderedFactor);
         (:info, r"evaluation"),
         (:info, r"tuned_pipe_evaluation"),
         (:info, r"ensemble_prediction"),
-        MLJTest.test(
+        MLJTestIntegration.test(
             classifiers,
             X,
             y;
@@ -186,7 +186,7 @@ end
 @testset "level" begin
     # level=1:
     fails, summary  =
-        @test_logs MLJTest.test(
+        @test_logs MLJTestIntegration.test(
             classifiers,
             X,
             y;
@@ -210,7 +210,7 @@ end
 
     # level=2:
     fails, summary  =
-        @test_logs MLJTest.test(
+        @test_logs MLJTestIntegration.test(
             classifiers,
             X,
             y;
@@ -234,10 +234,10 @@ end
 end
 
 @testset "iterative model" begin
-    X, y = MLJTest.make_dummy();
+    X, y = MLJTestIntegration.make_dummy();
     fails, summary =
-        MLJTest.test(
-            [MLJTest.DummyIterativeModel,],
+        MLJTestIntegration.test(
+            [MLJTestIntegration.DummyIterativeModel,],
             X,
             y;
             mod=@__MODULE__,
@@ -247,7 +247,7 @@ end
     @test isempty(fails)
     @test summary[1] == (
         name = "DummyIterativeModel",
-        package_name = "MLJTest",
+        package_name = "MLJTestIntegration",
         model_type = "✓",
         model_instance = "✓",
         fitted_machine = "✓",

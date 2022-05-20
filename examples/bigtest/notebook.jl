@@ -1,13 +1,13 @@
 # **Assumption.** This file has not been separated from the
 # Project.toml file that
-# [originally](https://github.com/JuliaAI/MLJTest.jl/blob/dev/examples/bigtest/Project.toml)
+# [originally](https://github.com/JuliaAI/MLJTestIntegration.jl/blob/dev/examples/bigtest/Project.toml)
 # accompanied it.
 
 using Pkg
 Pkg.activate(@__DIR__)
 Pkg.instantiate()
 
-using MLJTest
+using MLJTestIntegration
 using MLJModels
 using Test
 using DataFrames # for displaying tables
@@ -25,9 +25,9 @@ known_issues = models() do model
     ])
 end
 
-MLJTest.test_single_target_regressors(ignore=known_issues, level=1)
+MLJTestIntegration.test_single_target_regressors(ignore=known_issues, level=1)
 fails, summary =
-    MLJTest.test_single_target_regressors(ignore=known_issues, level=3)
+    MLJTestIntegration.test_single_target_regressors(ignore=known_issues, level=3)
 
 @test isempty(fails)
 summary |> DataFrame
@@ -46,6 +46,6 @@ known_issues = [
     (name="SVMNuClassifier", package_name="ScikitLearn"),
 ]
 
-MLJTest.test_single_target_classifiers(ignore=known_issues, level=1)
+MLJTestIntegration.test_single_target_classifiers(ignore=known_issues, level=1)
 fails, summary =
-    MLJTest.test_single_target_classifiers(ignore=known_issues, level=3)
+    MLJTestIntegration.test_single_target_classifiers(ignore=known_issues, level=3)

@@ -1,4 +1,4 @@
-module MLJTest
+module MLJTestIntegration
 
 using MLJ
 using Pkg

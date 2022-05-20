@@ -11,7 +11,7 @@
         (name="1", package_name="B"),
     ]
 
-    @test MLJTest._filter(proxies, bad) == [
+    @test MLJTestIntegration._filter(proxies, bad) == [
         (name="2", package_name="B", extra="dog"),
         (name="1", package_name="C", extra="rat"),
     ]

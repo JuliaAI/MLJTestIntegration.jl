@@ -1,8 +1,8 @@
 using Test
 using Pkg
-using MLJTest
-using MLJTest.MLJ
-using MLJTest.MLJ.MLJModels
+using MLJTestIntegration
+using MLJTestIntegration.MLJ
+using MLJTestIntegration.MLJ.MLJModels
 
 # enable conditional testing of modules by providing test_args
 # e.g. `Pkg.test("MLJBase", test_args=["misc"])`

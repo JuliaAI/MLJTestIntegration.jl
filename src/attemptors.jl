@@ -30,7 +30,7 @@ finalize(message, verbosity) = verbosity < 2 ? "" : message
 # is updated to 0.16. And delete the two methods immediately
 # following. What's required will already be in MLJModels 0.15.10, but
 # the current implementation avoids an explicit MLJModels dependency
-# for MLJTest.
+# for MLJTestIntegration.
 load_path(model_type) = MLJ.load_path(model_type)
 function load_path(proxy::NamedTuple)
     handle = (name=proxy.name, pkg=proxy.package_name)
@@ -43,7 +43,7 @@ function model_type(proxy, mod; throw=false, verbosity=1)
     # check interface package really is in current environment:
     message = "[:model_type] Loading model type "
     model_type, outcome = attempt(finalize(message, verbosity); throw) do
-        load_path = MLJTest.load_path(proxy) # MLJ.load_path(proxy) *****
+        load_path = MLJTestIntegration.load_path(proxy) # MLJ.load_path(proxy) *****
         load_path_ex = load_path |> Meta.parse
         api_pkg_ex = root(load_path) |> Symbol
         import_ex = :(import $api_pkg_ex)
@@ -61,7 +61,7 @@ function model_type(proxy, mod; throw=false, verbosity=1)
         # above, `model_type`, was triggered because of API package is
         # missing from in environment.
         api_pkg = try
-            load_path = MLJTest.load_path(proxy) # MLJ.load_path(proxy) *****
+            load_path = MLJTestIntegration.load_path(proxy) # MLJ.load_path(proxy) *****
             api_pkg = root(load_path)
         catch
             nothing

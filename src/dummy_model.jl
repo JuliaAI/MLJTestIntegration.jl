@@ -142,8 +142,8 @@ end
 MMI.predict(::DummyIterativeModel, fitresult, Xnew) =
     [fitresult[c].avg for c in Xnew]
 
-MMI.package_name(::Type{<:DummyIterativeModel}) = "MLJTest"
-MMI.load_path(::Type{<:DummyIterativeModel}) = "MLJTest.DummyIterativeModel"
+MMI.package_name(::Type{<:DummyIterativeModel}) = "MLJTestIntegration"
+MMI.load_path(::Type{<:DummyIterativeModel}) = "MLJTestIntegration.DummyIterativeModel"
 MMI.iteration_parameter(::Type{<:DummyIterativeModel}) = :n
 MMI.training_losses(::DummyIterativeModel, report) = report.training_losses
 

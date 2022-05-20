@@ -81,10 +81,10 @@ The following tests the model interface implemented by some model type
 type:
 
 ```julia
-import MLJTest
+import MLJTestIntegration
 using Test
-X, y = MLJTest.MLJ.make_blobs()
-failures, summary = MLJTest.test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
+X, y = MLJTestIntegration.MLJ.make_blobs()
+failures, summary = MLJTestIntegration.test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
 @test isempty(failures)
 ```
 
@@ -97,19 +97,19 @@ package `MLJGLMInterface`, this must be in the current environment:
 
 ```julia
 Pkg.add("MLJGLMInterface")
-import MLJBase, MLJTest
+import MLJBase, MLJTestIntegration
 using DataFrames # to view summary
-X, y = MLJTest.MLJ.make_regression();
-regressors = MLJTest.MLJ.models(matching(X, y)) do m
+X, y = MLJTestIntegration.MLJ.make_regression();
+regressors = MLJTestIntegration.MLJ.models(matching(X, y)) do m
     m.package_name == "GLM"
 end
 
 # to test code loading *and* load code:
-MLJTest.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=1)
+MLJTestIntegration.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=1)
 
 # comprehensive tests:
 failures, summary =
-    MLJTest.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=1)
+    MLJTestIntegration.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=1)
 
 summary |> DataFrame
 ```
@@ -225,7 +225,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         row = merge(row0, (; name, package_name))
 
         # model_type:
-        model_type, outcome = MLJTest.model_type(model_proxy, mod; throw, verbosity)
+        model_type, outcome = MLJTestIntegration.model_type(model_proxy, mod; throw, verbosity)
         row = update(row, i, :model_type, model_type, outcome)
         outcome == "×" && continue
 
@@ -233,19 +233,19 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
 
         # model_instance:
         model_instance, outcome =
-            MLJTest.model_instance(model_type; throw, verbosity)
+            MLJTestIntegration.model_instance(model_type; throw, verbosity)
         row = update(row, i, :model_instance, model_instance, outcome)
         outcome == "×" && continue
 
         # fitted_machine:
         fitted_machine, outcome =
-            MLJTest.fitted_machine(model_instance, data...; throw, verbosity)
+            MLJTestIntegration.fitted_machine(model_instance, data...; throw, verbosity)
         row = update(row, i, :fitted_machine, fitted_machine, outcome)
         outcome == "×" && continue
 
         # operations:
         operations, outcome =
-            MLJTest.operations(fitted_machine, data...; throw, verbosity)
+            MLJTestIntegration.operations(fitted_machine, data...; throw, verbosity)
         # special treatment to get list of operations in `summary`:
         if operations == "×"
             row = update(row, i, :operations, operations, outcome)
@@ -266,7 +266,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
             scitype(data[2]) <: AbstractVector{<:Finite{2}}
 
             threshold_prediction, outcome =
-                MLJTest.threshold_prediction(model_instance, data...; throw, verbosity)
+                MLJTestIntegration.threshold_prediction(model_instance, data...; throw, verbosity)
             row = update(row, i, :threshold_prediction, threshold_prediction, outcome)
             outcome == "×" && continue
         end
@@ -277,13 +277,13 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
 
         # evaluation:
         evaluation, outcome =
-            MLJTest.evaluation(measure, model_instance, data...; throw, verbosity)
+            MLJTestIntegration.evaluation(measure, model_instance, data...; throw, verbosity)
         row = update(row, i, :evaluation, evaluation, outcome)
         outcome == "×" && continue
 
         # tuned_pipe_evaluation:
         tuned_pipe_evaluation, outcome =
-            MLJTest.tuned_pipe_evaluation(
+            MLJTestIntegration.tuned_pipe_evaluation(
                 measure,
                 model_instance,
                 data...;
@@ -295,7 +295,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
 
         # ensemble_prediction:
         ensemble_prediction, outcome =
-            MLJTest.ensemble_prediction(model_instance, data...; throw, verbosity)
+            MLJTestIntegration.ensemble_prediction(model_instance, data...; throw, verbosity)
         row = update(row, i, :ensemble_prediction, ensemble_prediction, outcome)
         outcome == "×" && continue
 
@@ -303,7 +303,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
 
         # iteration prediction:
         iteration_prediction, outcome =
-            MLJTest.iteration_prediction(measure, model_instance, data...; throw, verbosity)
+            MLJTestIntegration.iteration_prediction(measure, model_instance, data...; throw, verbosity)
         row = update(row, i, :iteration_prediction, iteration_prediction, outcome)
         outcome == "×" && continue
     end
