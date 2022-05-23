@@ -1,5 +1,13 @@
 # # HELPERS
 
+const DOC_AS_ABOVE =
+    """
+    The same as above, but restricting to those registered models that are also
+    in `models`, a vector of named tuples inlcuding `:name` and
+    `:package_name` as keys. If `ignore=true`, then instead apply tests
+    to all models but *excluding* those in `models`.
+    """
+
 function warn_not_testing_these(models)
     "Not testing the following models, as incompatible with testing data:\n"*
         "$models"
@@ -37,6 +45,19 @@ function _make_binary()
     return X, y
 end
 
+"""
+    MLJTestIntegration.test_single_target_classifiers(; keyword_options...)
+
+Apply [`MLJTestIntegration.test`](@ref) to all models in the MLJ Model
+Registry that support single target classification, using a
+two-feature selection of the Crab dataset. The specifed
+`keyword_options` are passed to onto to `MLJTestIntegration.test`.
+
+    MLJTestIntegration.test_single_target_classifiers(models; ignore=false, keyword_options...)
+
+$DOC_AS_ABOVE
+
+"""
 test_single_target_classifiers(args...; kwargs...) =
     _test(args..., _make_binary(); kwargs...)
 
@@ -49,6 +70,19 @@ function _make_baby_boston()
     return X, y
 end
 
+"""
+    MLJTestIntegration.test_single_target_regressors(; keyword_options...)
+
+Apply [`MLJTestIntegration.test`](@ref) to all models in the MLJ Model
+Registry that support single target regression, using a two-feature
+selection of the Boston dataset. The specifed `keyword_options` are
+passed onto `MLJTestIntegration.test`.
+
+    MLJTestIntegration.test_single_target_regressors(models; ignore=false, keyword_options...)
+
+$DOC_AS_ABOVE
+
+"""
 test_single_target_regressors(args...; kwargs...) =
     _test(args..., _make_baby_boston(); kwargs...)
 
@@ -61,6 +95,21 @@ function _make_count()
     return X, y
 end
 
+"""
+    MLJTestIntegration.test_single_count_regressors(; keyword_options...)
+
+Apply [`MLJTestIntegration.test`](@ref) to all models in the MLJ Model
+Registry that support single target count regressors
+(`AbstractVector{Count}` target scitype) using a two-feature selection
+of the Boston datasetand the target variable discretized.  The
+specifed `keyword_options` are passed onto
+`MLJTestIntegration.test`.
+
+    MLJTestIntegration.test_single_target_regressors(models; ignore=false, keyword_options...)
+
+$DOC_AS_ABOVE
+
+"""
 test_single_target_count_regressors(args...; kwargs...) =
     _test(args..., _make_count(); kwargs...)
 
@@ -69,5 +118,17 @@ test_single_target_count_regressors(args...; kwargs...) =
 
 _make_transformer() = (first(_make_baby_boston()),)
 
+"""
+    test_continuous_table_transformers(; keyword_options...)
+
+Apply [`MLJTestIntegration.test`](@ref) to all models in the MLJ
+Model Registry that train on a single table with continuous features,
+using a two-feature selection of the Boston dataset.  The specifed
+`keyword_options` are passed onto `MLJTestIntegration.test`.
+
+    test_continuous_table_transformers(models; ignore=false, keyword_options...)
+
+$DOC_AS_ABOVE
+"""
 test_continuous_table_transformers(args...; kwargs...) =
     _test(args..., _make_transformer(); kwargs...)

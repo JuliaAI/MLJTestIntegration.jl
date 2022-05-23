@@ -17,21 +17,13 @@ using `data` for training. Here `mod` should be the module from which
 `test` is called (generally, `mod=@__MODULE__` will work). Here
 `models` is either:
 
-1. A collection of model types implementing the [MLJ model
-interface](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/).
+1. A collection of model types implementing the [MLJ model interface](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/).
 
-2. A collection of named tuples, where each tuple includes `:name` and
-  `:package_name` as keys, and whose corresponding values point to a
-  model types appearing in the [MLJ Model
-  Registry](https://github.com/JuliaAI/MLJModels.jl/tree/dev/src/registry).
-  `MLJ.models(...)` always returns such a collection.
+2. A collection of named tuples, where each tuple includes `:name` and `:package_name` as keys, and whose corresponding values point to a model type appearing in the [MLJ Model Registry](https://github.com/JuliaAI/MLJModels.jl/tree/dev/src/registry). `MLJ.models(...)` always returns such a collection.
 
 Ordinarily, code defining the model types to be tested must already be
 loaded into the module `mod`. An exception is described under "Testing
 with automatic code loading" below.
-
-  interface packages providing the models must be in the current
-  environment, but the packages need not be loaded.
 
 The extent of testing is controlled by `level`:
 
