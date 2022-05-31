@@ -4,9 +4,15 @@
     good() = 42
 
     @test (@test_logs MLJTestIntegration.attempt(bad, "")) == (e, "×")
-    @test (@test_logs (:info, "look ×") MLJTestIntegration.attempt(bad, "look "))  == (e, "×")
+    @test(@test_logs(
+        (:info, "look ×"),
+        MLJTestIntegration.attempt(bad, "look "),
+    )  == (e, "×"))
     @test (@test_logs MLJTestIntegration.attempt(good, "")) == (42, "✓")
-    @test (@test_logs (:info, "look ✓") MLJTestIntegration.attempt(good, "look "))  == (42, "✓")
+    @test (@test_logs(
+        (:info, "look ✓"),
+        MLJTestIntegration.attempt(good, "look "),
+    )  == (42, "✓"))
     @test_throws e MLJTestIntegration.attempt(bad, ""; throw=true)
 end
 

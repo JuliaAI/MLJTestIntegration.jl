@@ -1,9 +1,12 @@
+const ERR_INCONSISTENT_RESULTS =
+    "Different computational resources are giving different results. "
+
 """
     attempt(f, message; throw=false)
 
 Return `(f(), "✓") if `f()` executes without throwing an
 exception. Otherwise, return `(ex, "×"), where `ex` is the exception
-caught. Only truly throw the exception if `throw=true`. 
+caught. Only truly throw the exception if `throw=true`.
 
 If `message` is not empty, then it is logged to `Info`, together with
 the second return value ("✓" or "×").
@@ -123,32 +126,51 @@ function threshold_prediction(model, data...; throw=false, verbosity=1)
     end
 end
 
-function evaluation(measure, model, data...; throw=false, verbosity=1)
+function evaluation(measure, model, resources, data...; throw=false, verbosity=1)
     message = "[:evaluation] Evaluating performance "
     attempt(finalize(message, verbosity); throw) do
-        evaluate(model, data...;
-                 measure=measure,
-                 resampling=Holdout(),
-                 verbosity=0)
+        es = map(resources) do accel
+            evaluate(model, data...;
+                     measure=measure,
+                     resampling=Holdout(),
+                     acceleration=accel,
+                     verbosity=0)
+        end
+        ms = map(e->e.measurement, es)
+        m = first(ms)
+        @assert all(≈(m), collect(ms)[2:end]) ERR_INCONSISTENT_RESULTS
+        return first(es)
     end
 end
 
-function tuned_pipe_evaluation(measure, model, data...; throw=false, verbosity=1)
+function tuned_pipe_evaluation(
+    measure,
+    model,
+    data...;
+    throw=false,
+    verbosity=1,
+)
     message = "[:tuned_pipe_evaluation] Evaluating perfomance in a tuned pipeline "
     attempt(finalize(message, verbosity); throw) do
         pipe = identity |> model
-        tuned_pipe = TunedModel(models=[pipe,],
-                                measure=measure)
-        evaluate(tuned_pipe, data...;
-                 measure=measure,
-                 verbosity=0);
+        tuned_pipe = TunedModel(
+            models=[pipe,],
+            measure=measure,
+        )
+        evaluate(
+            tuned_pipe, data...;
+            measure=measure,
+            verbosity=0,
+        )
     end
 end
 
 function ensemble_prediction(model, data...; throw=false, verbosity=1)
     attempt(finalize("[:ensemble_prediction] Ensembling ", verbosity); throw) do
-        imodel = EnsembleModel(model=model,
-                               n=2)
+        imodel = EnsembleModel(
+            model=model,
+            n=2,
+        )
         mach = machine(imodel, data...)
         fit!(mach, verbosity=0)
         predict(mach, first(data))

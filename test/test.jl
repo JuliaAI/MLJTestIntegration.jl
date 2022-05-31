@@ -11,6 +11,7 @@ expected_summary1 = (
     fitted_machine = "✓",
     operations = "predict",
     evaluation = "✓",
+    accelerated_evaluation = "✓",
     tuned_pipe_evaluation = "✓",
     threshold_prediction = "✓",
     ensemble_prediction = "✓",
@@ -25,6 +26,7 @@ expected_summary2 = (
     fitted_machine = "✓",
     operations = "predict",
     evaluation = "✓",
+    accelerated_evaluation = "✓",
     tuned_pipe_evaluation = "✓",
     threshold_prediction = "-",
     ensemble_prediction = "✓",
@@ -41,7 +43,7 @@ expected_summary2 = (
             X,
             y;
             mod=@__MODULE__,
-            level=3,
+            level=4,
             verbosity=0
         )
     @test isempty(fails)
@@ -61,7 +63,7 @@ end
             X,
             y;
             mod=@__MODULE__,
-            level=3,
+            level=4,
             verbosity=0
         )
     @test isempty(fails)
@@ -109,6 +111,7 @@ end
         fitted_machine = "×",
         operations = "-",
         evaluation = "-",
+        accelerated_evaluation = "-",
         tuned_pipe_evaluation = "-",
         threshold_prediction = "-",
         ensemble_prediction = "-",
@@ -123,6 +126,7 @@ end
         fitted_machine = "✓",
         operations = "predict",
         evaluation = "×",
+        accelerated_evaluation = "-",
         tuned_pipe_evaluation = "-",
         threshold_prediction = "-",
         ensemble_prediction = "-",
@@ -201,6 +205,7 @@ end
         fitted_machine = "-",
         operations = "-",
         evaluation = "-",
+        accelerated_evaluation = "-",
         tuned_pipe_evaluation = "-",
         threshold_prediction = "-",
         ensemble_prediction = "-",
@@ -225,9 +230,35 @@ end
         fitted_machine = "✓",
         operations = "predict",
         evaluation = "-",
+        accelerated_evaluation = "-",
         tuned_pipe_evaluation = "-",
         threshold_prediction = "-",
         ensemble_prediction = "-",
+        iteration_prediction = "-",
+    )
+
+    # level=4:
+    fails, summary  =
+        @test_logs MLJTestIntegration.test(
+            classifiers,
+            X,
+            y;
+            mod=@__MODULE__,
+            level=4,
+            verbosity=0)
+    @test isempty(fails)
+    @test summary[1] == (
+        name = "ConstantClassifier",
+        package_name = "MLJModels",
+        model_type = "✓",
+        model_instance = "✓",
+        fitted_machine = "✓",
+        operations = "predict",
+        evaluation = "✓",
+        accelerated_evaluation = "✓",
+        tuned_pipe_evaluation = "✓",
+        threshold_prediction = "✓",
+        ensemble_prediction = "✓",
         iteration_prediction = "-",
     )
 end
@@ -252,8 +283,10 @@ end
         fitted_machine = "✓",
         operations = "predict",
         evaluation = "✓",
+        accelerated_evaluation = "-",
         tuned_pipe_evaluation = "✓",
         threshold_prediction = "-",
         ensemble_prediction = "✓",
-        iteration_prediction = "✓",)
+        iteration_prediction = "✓",
+    )
 end

@@ -27,11 +27,12 @@ with automatic code loading" below.
 
 The extent of testing is controlled by `level`:
 
-|`level`          | description                      | tests (full list below) |
-|:----------------|:---------------------------------|:------------------------|
-| 1               | test code loading                | `:model_type`           |
-| 2 (default)     | basic test of model interface    | first four tests        |
-| 3               | comprehensive                    | all applicable tests    |
+|`level`          | description                       | tests (full list below) |
+|:----------------|:----------------------------------|:------------------------|
+| 1               | test code loading                 | `:model_type`           |
+| 2 (default)     | basic test of model interface     | first four tests        |
+| 3               | comprehensive CPU1()              | all CPU1() tests        |
+| 4               | comprehensive CPU1()/CPUThreads() | all tests               |
 
 By default, exceptions caught in tests are not thrown. If
 `throw=true`, testing will terminate at the first execption
@@ -131,6 +132,10 @@ These additional tests are applied to `Supervised` models:
   (metric), evaluate the performance of the model using `evaluate!`
   and a `Holdout` set.
 
+- `:accelerated_evaluation`: Assuming the model appears to make
+  repeatable predictions on retraining, repeat the `:evaluation` test
+  using `CPUThreads()` acceleration and check agreement with `CPU1()` case.
+
 - `:tuned_pipe_evaluation`: Repeat the `:evauation` test but first
   insert model in a pipeline with a trivial pre-processing step
   (applies the identity transformation) and wrap in `TunedModel` (only
@@ -156,11 +161,12 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         :fitted_machine,
         :operations,
         :evaluation,
+        :accelerated_evaluation,
         :tuned_pipe_evaluation,
         :threshold_prediction,
         :ensemble_prediction,
         :iteration_prediction
-    ), NTuple{11, String}}}(undef, nproxies)
+    ), NTuple{12, String}}}(undef, nproxies)
 
     # summary table row corresponding to all tests skipped:
     row0 = (
@@ -171,6 +177,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         fitted_machine = "-",
         operations = "-",
         evaluation = "-",
+        accelerated_evaluation = "-",
         tuned_pipe_evaluation = "-",
         threshold_prediction = "-",
         ensemble_prediction = "-",
@@ -269,9 +276,55 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
 
         # evaluation:
         evaluation, outcome =
-            MLJTestIntegration.evaluation(measure, model_instance, data...; throw, verbosity)
+            MLJTestIntegration.evaluation(
+                measure,
+                model_instance,
+                [CPU1(),],
+                data...;
+                throw,
+                verbosity,
+            )
         row = update(row, i, :evaluation, evaluation, outcome)
         outcome == "×" && continue
+
+        # determine computational resources to test; we only test more
+        # than CPU1() if model evaluations are independent of training
+        # run (assuming this means models are "deterministic", ie,
+        # RNGs):
+        resources = MLJ.AbstractResource[] # fallback
+        if level  > 3
+            per_fold = evaluation.per_fold[1]
+            per_folds = map(1:(N_MODELS_FOR_REPEATABILITY_TEST - 1)) do _
+                e, o = MLJTestIntegration.evaluation(
+                    measure,
+                    model_instance,
+                    [CPU1(),],
+                    data...;
+                    throw=false,
+                    verbosity,
+                )
+                o == "✓" || return nothing
+                e.per_fold[1]
+            end
+            if all(≈(per_fold), per_folds)
+                resources = RESOURCES
+            end
+        end
+
+        if length(resources) > 1
+            # accelerated_evaluation:
+            evaluation, outcome =
+                MLJTestIntegration.evaluation(
+                    measure,
+                    model_instance,
+                    resources,
+                    data...;
+                    throw,
+                    verbosity,
+                )
+            row = update(row, i, :accelerated_evaluation, evaluation, outcome)
+            outcome == "×" && continue
+        end
 
         # tuned_pipe_evaluation:
         tuned_pipe_evaluation, outcome =
@@ -287,7 +340,12 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
 
         # ensemble_prediction:
         ensemble_prediction, outcome =
-            MLJTestIntegration.ensemble_prediction(model_instance, data...; throw, verbosity)
+            MLJTestIntegration.ensemble_prediction(
+                model_instance,
+                data...;
+                throw,
+                verbosity,
+            )
         row = update(row, i, :ensemble_prediction, ensemble_prediction, outcome)
         outcome == "×" && continue
 
@@ -295,7 +353,13 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
 
         # iteration prediction:
         iteration_prediction, outcome =
-            MLJTestIntegration.iteration_prediction(measure, model_instance, data...; throw, verbosity)
+            MLJTestIntegration.iteration_prediction(
+                measure,
+                model_instance,
+                data...;
+                throw,
+                verbosity,
+            )
         row = update(row, i, :iteration_prediction, iteration_prediction, outcome)
         outcome == "×" && continue
     end
