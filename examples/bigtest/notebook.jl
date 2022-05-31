@@ -35,7 +35,7 @@ fails1, report1 =
     MLJTestIntegration.test_single_target_regressors(
         known_problems,
         ignore=true,
-        level=3
+        level=4
     )
 
 fails1 |> DataFrame
@@ -49,12 +49,17 @@ report1 |> DataFrame
 
 # https://github.com/alan-turing-institute/MLJ.jl/issues/939
 known_problems = [
+    (name = "KernelPerceptronClassifier", package_name="BetaML"),
     (name = "DecisionTreeClassifier", package_name="BetaML"),
     (name = "PerceptronClassifier", package_name="BetaML"),
     (name = "NuSVC", package_name="LIBSVM"),
     (name="PegasosClassifier", package_name="BetaML"),
     (name="RandomForestClassifier", package_name="BetaML"),
     (name="SVMNuClassifier", package_name="ScikitLearn"),
+    (name="KernelPerceptronClassifier", package_name="BetaML"),
+    (name="LinearSVC", package_name="LIBSVM"),
+    (name= "MultinomialClassifier", "MLJLinearModels"),
+    (name="SVMLinearClassifier", package_name="ScikitLearn"),
 ]
 
 MLJTestIntegration.test_single_target_classifiers(
@@ -66,7 +71,7 @@ fails2, report2 =
     MLJTestIntegration.test_single_target_classifiers(
         known_problems,
         ignore=true,
-        level=3,
+        level=4,
     )
 
 fails2 |> DataFrame

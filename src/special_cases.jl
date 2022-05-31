@@ -16,6 +16,9 @@ end
 strip(proxy) = (name=proxy.name, package_name=proxy.package_name)
 
 function actual_proxies(raw_proxies, data, ignore, verbosity)
+    if !(raw_proxies isa Vector)
+        raw_proxies = [raw_proxies, ]
+    end 
     proxies = strip.(raw_proxies)
     from_registry = strip.(models(matching(data...)))
     if ignore
