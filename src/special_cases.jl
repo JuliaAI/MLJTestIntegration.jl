@@ -18,7 +18,7 @@ strip(proxy) = (name=proxy.name, package_name=proxy.package_name)
 function actual_proxies(raw_proxies, data, ignore, verbosity)
     if !(raw_proxies isa Vector)
         raw_proxies = [raw_proxies, ]
-    end 
+    end
     proxies = strip.(raw_proxies)
     from_registry = strip.(models(matching(data...)))
     if ignore
@@ -34,7 +34,7 @@ function actual_proxies(raw_proxies, data, ignore, verbosity)
 end
 
 function _test(proxies, data; ignore::Bool=false, verbosity=1, kwargs...)
-    test(actual_proxies(proxies, data, ignore, verbosity), data...; kwargs...)
+    test(actual_proxies(proxies, data, ignore, verbosity), data...; verbosity, kwargs...)
 end
 _test(data; ignore=true, kwargs...) = _test([], data; ignore, kwargs...)
 

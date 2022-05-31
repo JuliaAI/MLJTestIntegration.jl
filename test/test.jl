@@ -3,7 +3,7 @@ classifiers = [
     (name = "DeterministicConstantClassifier", package_name = "MLJModels")
 ]
 
-expected_summary1 = (
+expected_report1 = (
     name = "ConstantClassifier",
     package_name = "MLJModels",
     model_type = "✓",
@@ -15,10 +15,12 @@ expected_summary1 = (
     tuned_pipe_evaluation = "✓",
     threshold_prediction = "✓",
     ensemble_prediction = "✓",
-    iteration_prediction = "-"
+    iteration_prediction = "-",
+    stack_evaluation = "✓",
+    accelerated_stack_evaluation = "✓",
 )
 
-expected_summary2 = (
+expected_report2 = (
     name = "DeterministicConstantClassifier",
     package_name = "MLJModels",
     model_type = "✓",
@@ -30,14 +32,16 @@ expected_summary2 = (
     tuned_pipe_evaluation = "✓",
     threshold_prediction = "-",
     ensemble_prediction = "✓",
-    iteration_prediction = "-"
+    iteration_prediction = "-",
+    stack_evaluation = "-",
+    accelerated_stack_evaluation = "-",
 )
 
 @testset "test classifiers on valid data (models are proxies)" begin
     X, y0 = make_moons();
     y = coerce(y0, OrderedFactor);
 
-    fails, summary  =
+    fails, report  =
         @test_logs MLJTestIntegration.test(
             classifiers,
             X,
@@ -47,8 +51,8 @@ expected_summary2 = (
             verbosity=0
         )
     @test isempty(fails)
-    @test summary[1] == expected_summary1
-    @test summary[2] == expected_summary2
+    @test report[1] == expected_report1
+    @test report[2] == expected_report2
 end
 
 @testset "test classifiers on valid data (models are types)" begin
@@ -57,7 +61,7 @@ end
     X, y0 = make_moons();
     y = coerce(y0, OrderedFactor);
 
-    fails, summary  =
+    fails, report  =
         @test_logs MLJTestIntegration.test(
             classifiers,
             X,
@@ -67,13 +71,13 @@ end
             verbosity=0
         )
     @test isempty(fails)
-    @test summary[1] == expected_summary1
-    @test summary[2] == expected_summary2
+    @test report[1] == expected_report1
+    @test report[2] == expected_report2
 end
 
 @testset "test classifiers on invalid data" begin
     X, y = make_regression(); # wrong data for a classifier
-    fails, summary = @test_logs(
+    fails, report = @test_logs(
         (:error, r""),
         match_mode=:any,
         MLJTestIntegration.test(
@@ -103,7 +107,7 @@ end
         exception = ""
     )
 
-    @test summary[1] == (
+    @test report[1] == (
         name = "ConstantClassifier",
         package_name = "MLJModels",
         model_type = "✓",
@@ -115,10 +119,12 @@ end
         tuned_pipe_evaluation = "-",
         threshold_prediction = "-",
         ensemble_prediction = "-",
-        iteration_prediction = "-"
+        iteration_prediction = "-",
+        stack_evaluation = "-",
+        accelerated_stack_evaluation = "-",
     )
 
-    @test summary[2] == (
+    @test report[2] == (
         name = "DeterministicConstantClassifier",
         package_name = "MLJModels",
         model_type = "✓",
@@ -130,7 +136,9 @@ end
         tuned_pipe_evaluation = "-",
         threshold_prediction = "-",
         ensemble_prediction = "-",
-        iteration_prediction = "-"
+        iteration_prediction = "-",
+        stack_evaluation = "-",
+        accelerated_stack_evaluation = "-",
     )
 
     # throw=true:
@@ -176,6 +184,7 @@ y = coerce(y0, OrderedFactor);
         (:info, r"evaluation"),
         (:info, r"tuned_pipe_evaluation"),
         (:info, r"ensemble_prediction"),
+        (:info, r"stack_evaluation"),
         MLJTestIntegration.test(
             classifiers,
             X,
@@ -188,7 +197,7 @@ end
 
 @testset "level" begin
     # level=1:
-    fails, summary  =
+    fails, report  =
         @test_logs MLJTestIntegration.test(
             classifiers,
             X,
@@ -197,7 +206,7 @@ end
             level=1,
             verbosity=0)
     @test isempty(fails)
-    @test summary[1] == (
+    @test report[1] == (
         name = "ConstantClassifier",
         package_name = "MLJModels",
         model_type = "✓",
@@ -210,10 +219,12 @@ end
         threshold_prediction = "-",
         ensemble_prediction = "-",
         iteration_prediction = "-",
+        stack_evaluation = "-",
+        accelerated_stack_evaluation = "-",
     )
 
     # level=2:
-    fails, summary  =
+    fails, report  =
         @test_logs MLJTestIntegration.test(
             classifiers,
             X,
@@ -222,7 +233,7 @@ end
             level=2,
             verbosity=0)
     @test isempty(fails)
-    @test summary[1] == (
+    @test report[1] == (
         name = "ConstantClassifier",
         package_name = "MLJModels",
         model_type = "✓",
@@ -235,10 +246,12 @@ end
         threshold_prediction = "-",
         ensemble_prediction = "-",
         iteration_prediction = "-",
+        stack_evaluation = "-",
+        accelerated_stack_evaluation = "-",
     )
 
     # level=4:
-    fails, summary  =
+    fails, report  =
         @test_logs MLJTestIntegration.test(
             classifiers,
             X,
@@ -247,7 +260,7 @@ end
             level=4,
             verbosity=0)
     @test isempty(fails)
-    @test summary[1] == (
+    @test report[1] == (
         name = "ConstantClassifier",
         package_name = "MLJModels",
         model_type = "✓",
@@ -260,12 +273,14 @@ end
         threshold_prediction = "✓",
         ensemble_prediction = "✓",
         iteration_prediction = "-",
+        stack_evaluation = "✓",
+        accelerated_stack_evaluation = "✓",
     )
 end
 
 @testset "iterative model" begin
     X, y = MLJTestIntegration.make_dummy();
-    fails, summary =
+    fails, report =
         MLJTestIntegration.test(
             [MLJTestIntegration.DummyIterativeModel,],
             X,
@@ -275,7 +290,7 @@ end
             verbosity=0
         )
     @test isempty(fails)
-    @test summary[1] == (
+    @test report[1] == (
         name = "DummyIterativeModel",
         package_name = "MLJTestIntegration",
         model_type = "✓",
@@ -288,5 +303,9 @@ end
         threshold_prediction = "-",
         ensemble_prediction = "✓",
         iteration_prediction = "✓",
+        stack_evaluation = "-",
+        accelerated_stack_evaluation = "-",
     )
 end
+
+true

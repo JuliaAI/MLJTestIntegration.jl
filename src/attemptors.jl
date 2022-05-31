@@ -127,7 +127,9 @@ function threshold_prediction(model, data...; throw=false, verbosity=1)
 end
 
 function evaluation(measure, model, resources, data...; throw=false, verbosity=1)
-    message = "[:evaluation] Evaluating performance "
+    L = length(resources)
+    message = L > 1 ? "[:accelerated_evaluation] " : "[evaluation] "
+    message *=  "Evaluating model performance using with $L resources. "
     attempt(finalize(message, verbosity); throw) do
         es = map(resources) do accel
             evaluate(model, data...;
@@ -136,7 +138,7 @@ function evaluation(measure, model, resources, data...; throw=false, verbosity=1
                      acceleration=accel,
                      verbosity=0)
         end
-        ms = map(e->e.measurement, es)
+        ms = map(e->sort(e.per_fold[1]), es)
         m = first(ms)
         @assert all(≈(m), collect(ms)[2:end]) ERR_INCONSISTENT_RESULTS
         return first(es)
@@ -177,6 +179,7 @@ function ensemble_prediction(model, data...; throw=false, verbosity=1)
     end
 end
 
+# the `model` must support iteration (`!isnothing(iteration_paramater(model))`)
 function iteration_prediction(measure, model, data...; throw=false, verbosity=1)
     message =  "[:iteration_prediction] Iterating with controls "
     attempt(finalize(message, verbosity); throw) do
@@ -188,5 +191,61 @@ function iteration_prediction(measure, model, data...; throw=false, verbosity=1)
         mach = machine(imodel, data...)
         fit!(mach, verbosity=0)
         predict(mach, first(data))
+    end
+end
+
+# the `model` can only be single-target deterministic regressor or
+# probabilistic classifier.
+function stack_evaluation(
+    model,
+    resources,
+    data...;
+    throw=false,
+    verbosity=1
+)
+    L = length(resources)
+    message = L > 1 ? "[:accelerated_stack_evaluation] " : "[stack_evaluation] "
+    message *=  "Evaluating a stack containing model "*
+        "with $L resources. "
+    target_scitype = MLJ.target_scitype(model)
+    if  AbstractVector{Continuous} <: target_scitype
+        models = (knn1=KNNRegressor(K=4),
+                  knn2=KNNRegressor(K=6),
+                  model=model)
+        metalearner = KNNRegressor()
+        measure = LPLoss(2)
+    else
+        models = (knn1=KNNClassifier(K=4),
+                  knn2=KNNClassifier(K=6),
+                  model=model)
+        metalearner = KNNClassifier()
+        measure = BrierScore()
+        # models = (tree=DecisionTreeClassifier(),
+        #           knn=KNNClassifier(K=6),
+        #           model=model)
+        # metalearner = KNNClassifier()
+        # measure = BrierScore()
+    end
+    attempt(finalize(message, verbosity); throw) do
+        es = map(resources) do accel
+            mystack = Stack(
+                ; metalearner,
+                resampling=CV(;nfolds=3),
+                acceleration=accel,
+                models...)
+
+            evaluate(
+                mystack,
+                data...;
+                measure=measure,
+                resampling=Holdout(),
+                verbosity=0,
+            )
+        end |> collect
+        ms = map(e->sort(e.per_fold[1]), es)
+        m = first(ms)
+#        @show ms
+        @assert all(≈(m), ms[2:end]) ERR_INCONSISTENT_RESULTS
+        first(es)
     end
 end

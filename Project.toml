@@ -6,6 +6,7 @@ version = "0.1.0"
 [deps]
 MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 MLJTuning = "03970b2e-30c4-11ea-3135-d1576263f10f"
+NearestNeighborModels = "636a865e-7cf4-491e-846c-de09b730eb36"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
