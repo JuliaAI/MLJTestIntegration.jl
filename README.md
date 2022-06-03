@@ -70,11 +70,11 @@ regressors = MLJTestIntegration.MLJ.models(matching(X, y)) do m
 end
 
 # to test code loading *and* load code:
-MLJTestIntegration.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=1)
+MLJTestIntegration.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=4)
 
 # comprehensive tests:
 failures, summary =
-    MLJTestIntegration.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=1)
+    MLJTestIntegration.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=4)
 
 summary |> DataFrame
 ```
