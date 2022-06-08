@@ -20,9 +20,6 @@ known_problems = models() do model
     any([
         # https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29
         model.package_name == "PartialLeastSquaresRegressor",
-
-        #https://github.com/JuliaAI/MLJXGBoostInterface.jl/issues/17
-        model.name == "XGBoostRegressor",
     ])
 end
 
@@ -59,14 +56,16 @@ known_problems = models() do model
         (name = "BayesianLDA", package_name = "MultivariateStats"),
         (name = "BayesianSubspaceLDA", package_name = "MultivariateStats"),
 
-        # https://github.com/alan-turing-institute/MLJ.jl/issues/939
+        # https://github.com/JuliaAI/MLJBase.jl/issues/781
         (name = "DecisionTreeClassifier", package_name="BetaML"),
-        (name = "PerceptronClassifier", package_name="BetaML"),
-        (name = "NuSVC", package_name="LIBSVM"),
-        (name="PegasosClassifier", package_name="BetaML"),
         (name="RandomForestClassifier", package_name="BetaML"),
+
+        # https://github.com/sylvaticus/BetaML.jl/issues/32
+        (name = "KernelPerceptronClassifier", package_name="BetaML"),
+
+        # https://github.com/alan-turing-institute/MLJ.jl/issues/939
+        (name = "NuSVC", package_name="LIBSVM"),
         (name="SVMNuClassifier", package_name="ScikitLearn"),
-        (name="KernelPerceptronClassifier", package_name="BetaML"),
         (name="LinearSVC", package_name="LIBSVM"),
         (name= "MultinomialClassifier", package_name="MLJLinearModels"),
         (name="SVMLinearClassifier", package_name="ScikitLearn"),

@@ -220,11 +220,6 @@ function stack_evaluation(
                   model=model)
         metalearner = KNNClassifier()
         measure = BrierScore()
-        # models = (tree=DecisionTreeClassifier(),
-        #           knn=KNNClassifier(K=6),
-        #           model=model)
-        # metalearner = KNNClassifier()
-        # measure = BrierScore()
     end
     attempt(finalize(message, verbosity); throw) do
         es = map(resources) do accel
