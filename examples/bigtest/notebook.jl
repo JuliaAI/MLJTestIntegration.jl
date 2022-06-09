@@ -19,6 +19,7 @@ known_problems = models() do model
     model.package_name in [
         "ScikitLearn",
         "LIBSVM",
+        "XGBoost",
     ] ||
     any([
         # https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29
@@ -53,6 +54,7 @@ known_problems = models() do model
     model.package_name in [
         "ScikitLearn",
         "LIBSVM",
+        "XGBoost",
     ] || (name = model.name, package_name = model.package_name) in [
 
         # https://github.com/JuliaAI/MLJMultivariateStatsInterface.jl/issues/41
