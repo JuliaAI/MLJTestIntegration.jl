@@ -16,7 +16,10 @@ using DataFrames # for displaying tables
 # # Regression
 
 known_problems = models() do model
-    !model.is_pure_julia ||
+    model.package_name in [
+        "ScikitLearn",
+        "LIBSVM",
+    ] ||
     any([
         # https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29
         model.package_name == "PartialLeastSquaresRegressor",
@@ -47,9 +50,11 @@ report1 |> DataFrame
 # # Classification
 
 known_problems = models() do model
-    !model.is_pure_julia ||
-    (name = model.name, package_name = model.package_name) in
-    [
+    model.package_name in [
+        "ScikitLearn",
+        "LIBSVM",
+    ] || (name = model.name, package_name = model.package_name) in [
+
         # https://github.com/JuliaAI/MLJMultivariateStatsInterface.jl/issues/41
         (name = "LDA", package_name = "MultivariateStats"),
         (name = "SubspaceLDA", package_name = "MultivariateStats"),

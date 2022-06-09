@@ -129,7 +129,7 @@ end
 function evaluation(measure, model, resources, data...; throw=false, verbosity=1)
     L = length(resources)
     message = L > 1 ? "[:accelerated_evaluation] " : "[evaluation] "
-    message *=  "Evaluating model performance using with $L resources. "
+    message *=  "Evaluating model performance using $L different resources. "
     attempt(finalize(message, verbosity); throw) do
         es = map(resources) do accel
             evaluate(model, data...;
@@ -206,7 +206,7 @@ function stack_evaluation(
     L = length(resources)
     message = L > 1 ? "[:accelerated_stack_evaluation] " : "[stack_evaluation] "
     message *=  "Evaluating a stack containing model "*
-        "with $L resources. "
+        "with $L different resources. "
     target_scitype = MLJ.target_scitype(model)
     if  AbstractVector{Continuous} <: target_scitype
         models = (knn1=KNNRegressor(K=4),
