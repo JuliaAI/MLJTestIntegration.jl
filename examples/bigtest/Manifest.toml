@@ -759,7 +759,9 @@ version = "0.18.2"
 
 [[deps.MLJBase]]
 deps = ["CategoricalArrays", "CategoricalDistributions", "ComputationalResources", "Dates", "DelimitedFiles", "Distributed", "Distributions", "InteractiveUtils", "InvertedIndices", "LinearAlgebra", "LossFunctions", "MLJModelInterface", "Missings", "OrderedCollections", "Parameters", "PrettyTables", "ProgressMeter", "Random", "ScientificTypes", "Serialization", "StatisticalTraits", "Statistics", "StatsBase", "Tables"]
-path = "/Users/anthony/MLJ/MLJBase"
+git-tree-sha1 = "14740ef3eec192e0b48a601fbb810cb64f7c7dca"
+repo-rev = "stack_cache_and_acceleration_rebased"
+repo-url = "https://github.com/JuliaAI/MLJBase.jl"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
 version = "0.20.4"
 
