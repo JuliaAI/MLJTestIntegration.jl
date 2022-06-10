@@ -147,15 +147,17 @@ These additional tests are applied to `Supervised` models:
 - `:iteration_prediction`: If the model is iterable, repeat the
   `:evaluation` test but first wrap as an `IteratedModel`.
 
-- `:stack_evaluation`: make the model one of three base models in a
-  `Stack`, and evaluate the `Stack`. 
+- `:stack_evaluation`: test a `Stack` within a `Stack`, with the model
+  being tested appearing at two levels, and evaluate the
+  `Stack`. (Other base models and adjudicators in the double stack are
+  instances of `KNNClassifier` or `KNNRegressor`.)
+  This test is only applied to single target supervised models that
+  are probabilistic classifiers or deterministic regressors.
 
 - `:accelerated_stack_evaluation`: If the model appears to make
   repeatable predictions on retraining, check consistency of
   evaluations for `Stack(acceleration=CPU1(), ...)` and
-  `Stack(acceleration=CPUThreads(), ...)`. This test is only applied
-  to single target supervised models that are probabilistic
-  classifiers or deterministic regressors.
+  `Stack(acceleration=CPUThreads(), ...)` (in the double stack above).
 
 """
 function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=1,)
@@ -338,7 +340,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
                 verbosity > 1 && println(" Repeatable.")
             else
                 verbosity > 1 && println(" Not repeatable.")
-            end 
+            end
         end
 
         length(resources) > 1 && verbosity > 0 &&

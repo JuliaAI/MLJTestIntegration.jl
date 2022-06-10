@@ -1,6 +1,6 @@
 module MLJTestIntegration
 
-const N_MODELS_FOR_REPEATABILITY_TEST = 50
+const N_MODELS_FOR_REPEATABILITY_TEST = 20
 
 using MLJ
 using Pkg

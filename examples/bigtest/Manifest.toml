@@ -851,9 +851,7 @@ version = "0.1.4"
 
 [[deps.MLJTestIntegration]]
 deps = ["MLJ", "MLJTuning", "NearestNeighborModels", "Pkg", "Test"]
-git-tree-sha1 = "5c7a7ab6746c897e1904468cf0f9ef460ae1876d"
-repo-rev = "multi-threading"
-repo-url = "https://github.com/JuliaAI/MLJTestIntegration.jl"
+path = "/Users/anthony/MLJ/MLJTestIntegration"
 uuid = "697918b4-fdc1-4f9e-8ff9-929724cee270"
 version = "0.1.0"
 
