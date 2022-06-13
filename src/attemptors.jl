@@ -134,7 +134,7 @@ function evaluation(measure, model, resources, data...; throw=false, verbosity=1
         es = map(resources) do resource
             evaluate(model, data...;
                      measure=measure,
-                     resampling=Holdout(),
+                     resampling=CV(nfolds=4),
                      acceleration=resource,
                      verbosity=0)
         end

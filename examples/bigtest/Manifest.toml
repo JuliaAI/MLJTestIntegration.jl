@@ -78,9 +78,9 @@ uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 [[deps.BetaML]]
 deps = ["CategoricalArrays", "Combinatorics", "DelimitedFiles", "Distributions", "ForceImport", "LinearAlgebra", "MLJModelInterface", "PDMats", "Printf", "ProgressMeter", "Random", "Reexport", "StableRNGs", "Statistics", "Test", "Zygote"]
-git-tree-sha1 = "d80754995042cfa9233611f9b80dfa17483c42fe"
+git-tree-sha1 = "487007edd486b6be32c14f63637efdf0a957a38e"
 uuid = "024491cd-cc6b-443e-8034-08ea7eb7db2b"
-version = "0.6.0"
+version = "0.6.1"
 
 [[deps.BinaryProvider]]
 deps = ["Libdl", "Logging", "SHA"]
@@ -143,9 +143,9 @@ version = "0.1.5"
 
 [[deps.ChainRules]]
 deps = ["ChainRulesCore", "Compat", "IrrationalConstants", "LinearAlgebra", "Random", "RealDot", "SparseArrays", "Statistics"]
-git-tree-sha1 = "e9023f88b1655ffc6a4aaef2502878e8116151ef"
+git-tree-sha1 = "34e265b1b0049896430625ce1638b2719c783c6b"
 uuid = "082447d4-558c-5d27-93f4-14fc19e9eca2"
-version = "1.35.1"
+version = "1.35.2"
 
 [[deps.ChainRulesCore]]
 deps = ["Compat", "LinearAlgebra", "SparseArrays"]
@@ -759,11 +759,11 @@ version = "0.18.2"
 
 [[deps.MLJBase]]
 deps = ["CategoricalArrays", "CategoricalDistributions", "ComputationalResources", "Dates", "DelimitedFiles", "Distributed", "Distributions", "InteractiveUtils", "InvertedIndices", "LinearAlgebra", "LossFunctions", "MLJModelInterface", "Missings", "OrderedCollections", "Parameters", "PrettyTables", "ProgressMeter", "Random", "ScientificTypes", "Serialization", "StatisticalTraits", "Statistics", "StatsBase", "Tables"]
-git-tree-sha1 = "14740ef3eec192e0b48a601fbb810cb64f7c7dca"
+git-tree-sha1 = "6ddcfc397fc589114d6a9008d6c2311b818cec3e"
 repo-rev = "stack_cache_and_acceleration_rebased"
 repo-url = "https://github.com/JuliaAI/MLJBase.jl"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
-version = "0.20.4"
+version = "0.20.5"
 
 [[deps.MLJClusteringInterface]]
 deps = ["Clustering", "Distances", "MLJModelInterface"]
@@ -850,7 +850,7 @@ uuid = "7fa162e1-0e29-41ca-a6fa-c000ca4e7e7e"
 version = "0.1.4"
 
 [[deps.MLJTestIntegration]]
-deps = ["MLJ", "MLJTuning", "NearestNeighborModels", "Pkg", "Test"]
+deps = ["MLJ", "MLJBase", "MLJTuning", "NearestNeighborModels", "Pkg", "Test"]
 path = "/Users/anthony/MLJ/MLJTestIntegration"
 uuid = "697918b4-fdc1-4f9e-8ff9-929724cee270"
 version = "0.1.0"
@@ -936,10 +936,10 @@ uuid = "d41bc354-129a-5804-8e4c-c37616107c6c"
 version = "7.8.2"
 
 [[deps.NNlib]]
-deps = ["Adapt", "ChainRulesCore", "Compat", "LinearAlgebra", "Pkg", "Requires", "Statistics"]
-git-tree-sha1 = "f89de462a7bc3243f95834e75751d70b3a33e59d"
+deps = ["Adapt", "ChainRulesCore", "LinearAlgebra", "Pkg", "Requires", "Statistics"]
+git-tree-sha1 = "a0331452b4cfd5e53ee2325376794aea47364d5a"
 uuid = "872c559c-99b0-510c-b3b7-b6c96a88d5cd"
-version = "0.8.5"
+version = "0.8.7"
 
 [[deps.NNlibCUDA]]
 deps = ["CUDA", "LinearAlgebra", "NNlib", "Random", "Statistics"]
@@ -1290,9 +1290,9 @@ version = "0.6.6"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "383a578bdf6e6721f480e749d503ebc8405a0b22"
+git-tree-sha1 = "2bbd9f2e40afd197a1379aef05e0d85dba649951"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.4.6"
+version = "1.4.7"
 
 [[deps.StatisticalTraits]]
 deps = ["ScientificTypesBase"]

@@ -130,7 +130,7 @@ These additional tests are applied to `Supervised` models:
 
 - `:evaluation`: Assuming MLJ is able to infer a suitable `measure`
   (metric), evaluate the performance of the model using `evaluate!`
-  and a `Holdout` set.
+  and and cross-validation.
 
 - `:accelerated_evaluation`: Assuming the model appears to make
   repeatable predictions on retraining, repeat the `:evaluation` test
@@ -317,8 +317,9 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         # determine computational resources:
         resources = MLJ.AbstractResource[CPU1(),] # fallback
         if level  > 3
-            per_fold = evaluation.per_fold[1]
-            per_folds = map(1:(N_MODELS_FOR_REPEATABILITY_TEST - 1)) do i
+            baseline = evaluation.per_fold[1]
+            repeatable = true
+            for i in 1:(N_MODELS_FOR_REPEATABILITY_TEST - 1)
                 verbosity > 1 && print(
                     "\rInternal repeatability tests, "*
                     "$(i + 1) of $N_MODELS_FOR_REPEATABILITY_TEST trials complete"
@@ -332,10 +333,13 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
                     verbosity=0,
                 )
                 o == "✓" || return nothing
-                e.per_fold[1]
+                if !(e.per_fold[1] ≈ baseline)
+                    repeatable = false
+                    break
+                end
             end
             verbosity > 1 && print(" ✓")
-            if all(≈(per_fold), per_folds)
+            if repeatable
                 resources = RESOURCES
                 verbosity > 1 && println(" Repeatable.")
             else
