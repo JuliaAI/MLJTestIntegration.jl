@@ -1,18 +1,26 @@
-@testset "_filter" begin
-    proxies = [
-        (name="1", package_name="A", extra="cat"),
-        (name="1", package_name="B", extra="mouse"),
-        (name="2", package_name="B", extra="dog"),
-        (name="1", package_name="C", extra="rat"),
-    ]
+classifiers = [
+    (name = "ConstantClassifier", package_name = "MLJModels"),
+    (name = "DeterministicConstantClassifier", package_name = "MLJModels")
+]
 
-    bad = [
-        (name="1", package_name="A"),
-        (name="1", package_name="B"),
-    ]
+regressors = [
+    (name = "ConstantRegressor", package_name = "MLJModels"),
+    (name = "DeterministicConstantRegressor", package_name = "MLJModels")
+]
 
-    @test MLJTestIntegration._filter(proxies, bad) == [
-        (name="2", package_name="B", extra="dog"),
-        (name="1", package_name="C", extra="rat"),
-    ]
+@testset "actual_proxies" begin
+    data =  MTI._make_baby_boston()
+    proxies = @test_logs MTI.actual_proxies(regressors, data, false, 1)
+    @test proxies == regressors
+    proxies2 = @test_logs MTI.actual_proxies(regressors, data, true, 1)
+    @test proxies2 == setdiff(MTI.strip.(models(matching(data...))), regressors)
+    proxies = @test_logs(
+        (:warn, MTI.warn_not_testing_these(classifiers)),
+        MTI.actual_proxies(vcat(regressors, classifiers), data, false, 1),
+    )
+    @test proxies == regressors
+    proxies = @test_logs(
+        MTI.actual_proxies(vcat(regressors, classifiers), data, true, 1),
+    )
+    @test proxies == proxies2
 end

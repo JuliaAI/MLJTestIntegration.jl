@@ -3,10 +3,12 @@ using Pkg
 using MLJTestIntegration
 using MLJTestIntegration.MLJ
 using MLJTestIntegration.MLJ.MLJModels
+const MTI = MLJTestIntegration
 
 # enable conditional testing of modules by providing test_args
 # e.g. `Pkg.test("MLJBase", test_args=["misc"])`
-RUN_ALL_TESTS = isempty(ARGS)
+
+const RUN_ALL_TESTS = isempty(ARGS)
 macro conditional_testset(name, expr)
     name = string(name)
     esc(quote

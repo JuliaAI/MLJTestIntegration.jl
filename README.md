@@ -15,9 +15,9 @@ Pkg.add("MLJTestIntegration")
 
 # Usage
 
-This package provides a single method for testing a collection of
-`models` (types or named tuples with keys `:name` and `:package_name`)
-using the specified training `data`:
+This package provides a method for testing a collection of `models`
+(types or named tuples with keys `:name` and `:package_name`) using
+the specified training `data`:
 
 ```julia
 MLJTestIntegration.test(models, data...; mod=Main, level=2, throw=false, verbosity=1) 
@@ -25,6 +25,16 @@ MLJTestIntegration.test(models, data...; mod=Main, level=2, throw=false, verbosi
 ```
 
 For detailed documentation, run `using MLJTestIntegration; @doc MLJTestIntegration.test`.
+
+For convenience, a number of specializations of this method are also provided: 
+
+- `test_single_target_classifiers`
+- `test_single_target_regressors`
+- `test_single_target_count_regressors`
+- `test_continuous_table_transformers`
+
+Query the document strings for details, or see
+[examples/bigtest/notebook.jl](examples/bigtest/notebook.jl).
 
 
 # Examples
@@ -60,11 +70,11 @@ regressors = MLJTestIntegration.MLJ.models(matching(X, y)) do m
 end
 
 # to test code loading *and* load code:
-MLJTestIntegration.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=1)
+MLJTestIntegration.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=4)
 
 # comprehensive tests:
 failures, summary =
-    MLJTestIntegration.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=1)
+    MLJTestIntegration.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=4)
 
 summary |> DataFrame
 ```
