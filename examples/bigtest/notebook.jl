@@ -67,12 +67,11 @@ known_problems = models() do model
         (name = "DecisionTreeClassifier", package_name="BetaML"),
         (name="RandomForestClassifier", package_name="BetaML"),
 
+        #https://github.com/JuliaAI/MLJLinearModels.jl/issues/123
+        (name= "MultinomialClassifier", package_name="MLJLinearModels"),
+
         # https://github.com/alan-turing-institute/MLJ.jl/issues/939
         (name = "NuSVC", package_name="LIBSVM"),
-        (name="SVMNuClassifier", package_name="ScikitLearn"),
-        (name="LinearSVC", package_name="LIBSVM"),
-        (name= "MultinomialClassifier", package_name="MLJLinearModels"),
-        (name="SVMLinearClassifier", package_name="ScikitLearn"),
     ]
 end
 
@@ -95,6 +94,3 @@ fails2 |> DataFrame
 #-
 
 report2 |> DataFrame
-
-
-
