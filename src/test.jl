@@ -118,7 +118,8 @@ that model are skipped. The following are applied to all models:
 
 - `:model_instance`: Create a default instance.
 
-- `:fitted_machine`: Bind instance to data in a machine and `fit!`
+- `:fitted_machine`: Bind instance to data in a machine and `fit!`. Call `report` and
+  `fitted_params` on the machine.
 
 - `:operations`: Call implemented operations, such as `predict` and `transform`
 
