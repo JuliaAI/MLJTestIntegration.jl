@@ -91,6 +91,9 @@ function fitted_machine(model, data...; throw=false, verbosity=1)
     attempt(finalize(message, verbosity); throw)  do
         mach = machine(model, data...)
         fit!(mach, verbosity=-1)
+        MLJ.report(mach)
+        MLJ.fitted_params(mach)
+        mach
     end
 end
 
