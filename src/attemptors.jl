@@ -89,7 +89,8 @@ end
 function fitted_machine(model, data...; throw=false, verbosity=1)
     message = "[:fitted_machine] Fitting machine "
     attempt(finalize(message, verbosity); throw)  do
-        mach = machine(model, data...)
+        mach = model isa Static ? machine(model) :
+                                  machine(model, data...)
         fit!(mach, verbosity=-1)
         MLJ.report(mach)
         MLJ.fitted_params(mach)
