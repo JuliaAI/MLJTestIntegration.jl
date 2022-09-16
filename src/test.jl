@@ -269,7 +269,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         operations, outcome =
             MLJTestIntegration.operations(fitted_machine, data...; throw, verbosity)
         # special treatment to get list of operations in `summary`:
-        if operations == "×"
+        if outcome == "×"
             row = update(row, i, :operations, operations, outcome)
             continue
         else
