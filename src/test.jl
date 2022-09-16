@@ -209,7 +209,6 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
     function update(row, i, test, value_or_exception, outcome)
         outcome_nt = NamedTuple{(test,)}((outcome,))
         updated_row = merge(row, outcome_nt)
-        @show updated_row
         summary[i] = updated_row
         if outcome == "×"
             failures_row = (
