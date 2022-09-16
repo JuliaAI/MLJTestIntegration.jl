@@ -55,6 +55,9 @@ Returns `(failures, summary)` where:
 | n/a   | skipped because not applicable     |
 | -     | test skipped for some other reason |
 
+In the special case of `operations`, an empty entry, `""`, indicates that there don't
+appear to be any operations implemented.
+
 # Testing with automatic code loading
 
 World Age issues pose challenges for testing Julia code if some code
