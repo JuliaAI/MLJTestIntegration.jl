@@ -209,6 +209,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
     function update(row, i, test, value_or_exception, outcome)
         outcome_nt = NamedTuple{(test,)}((outcome,))
         updated_row = merge(row, outcome_nt)
+        @show updated_row
         summary[i] = updated_row
         if outcome == "×"
             failures_row = (
@@ -266,7 +267,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         operations, outcome =
             MLJTestIntegration.operations(fitted_machine, data...; throw, verbosity)
         # special treatment to get list of operations in `summary`:
-        if operations == "×"
+        if outcome == "×"
             row = update(row, i, :operations, operations, outcome)
             continue
         else
