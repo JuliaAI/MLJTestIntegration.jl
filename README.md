@@ -41,14 +41,13 @@ Query the document strings for details, or see
 
 ## Testing models in a new MLJ model interface implementation
 
-The following tests the model interface implemented by some model type
-`MyClassifier`, as might appear in tests for a package providing that
-type:
+The following tests the model interface implemented by some model type `MyClassifier` for
+multiclass classification, as might appear in tests for a package providing that type:
 
 ```julia
 import MLJTestIntegration
 using Test
-X, y = MLJTestIntegration.MLJ.make_blobs()
+X, y = MLJTestIntegration.make_multiclass()
 failures, summary = MLJTestIntegration.test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
 @test isempty(failures)
 ```
@@ -78,3 +77,17 @@ failures, summary =
 
 summary |> DataFrame
 ```
+
+# Datasets
+
+The following commands generate datasets of the form `(X, y)` suitable for integration
+tests:
+
+- `MLJTestIntegration.make_binary` 
+
+- `MLJTestIntegration.make_multiclass` 
+
+- `MLJTestIntegration.make_regression` 
+
+- `MLJTestIntegration.make_count` 
+

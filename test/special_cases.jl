@@ -9,7 +9,7 @@ regressors = [
 ]
 
 @testset "actual_proxies" begin
-    data =  MTI._make_baby_boston()
+    data =  MTI.make_regression()
     proxies = @test_logs MTI.actual_proxies(regressors, data, false, 1)
     @test proxies == regressors
     proxies2 = @test_logs MTI.actual_proxies(regressors, data, true, 1)

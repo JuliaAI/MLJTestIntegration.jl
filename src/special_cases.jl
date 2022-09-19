@@ -39,14 +39,59 @@ end
 _test(data; ignore=true, kwargs...) = _test([], data; ignore, kwargs...)
 
 
-# # SINGLE TARGET CLASSIFICATION
+# # BABY DATA SETS
 
-function _make_binary()
+"""
+    make_binary()
+
+Return data `(X, y)` for the crabs dataset, restricted to the two features `:FL`,
+`:RW`. Target is `Multiclass{2}`.
+
+"""
+function make_binary()
     data = MLJ.load_crabs()
     y_, X = unpack(data, ==(:sp), col->col in [:FL, :RW])
     y = coerce(y_, MLJ.OrderedFactor)
     return X, y
 end
+
+"""
+    make_multiclass()
+
+Return data `(X, y)` for the unshuffled iris dataset. Target is `Multiclass{3}`.
+
+"""
+make_multiclass() = MLJ.@load_iris
+
+"""
+    make_regression()
+
+Return data `(X, y)` for the Boston dataset, restricted to the two features `:LStat`,
+`:Rm`. Target is `Continuous`.
+
+"""
+function make_regression()
+    data = MLJ.load_boston()
+    y, X = unpack(data, ==(:MedV), col->col in [:LStat, :Rm])
+    return X, y
+end
+
+"""
+    make_regression()
+
+Return data `(X, y)` for the Boston dataset, restricted to the two features `:LStat`,
+`:Rm`, with the `Continuous` target converted to `Count` (integer).
+
+"""
+function make_count()
+    X, y_ = make_regression()
+    y = map(η -> round(Int, η), y_)
+    return X, y
+end
+
+
+# # SINGLE TARGET CLASSIFICATION
+
 
 """
     MLJTestIntegration.test_single_target_classifiers(; keyword_options...)
@@ -62,16 +107,10 @@ $DOC_AS_ABOVE
 
 """
 test_single_target_classifiers(args...; kwargs...) =
-    _test(args..., _make_binary(); kwargs...)
+    _test(args..., make_binary(); kwargs...)
 
 
 # # SINGLE TARGET REGRESSION
-
-function _make_baby_boston()
-    data = MLJ.load_boston()
-    y, X = unpack(data, ==(:MedV), col->col in [:LStat, :Rm])
-    return X, y
-end
 
 """
     MLJTestIntegration.test_single_target_regressors(; keyword_options...)
@@ -87,16 +126,10 @@ $DOC_AS_ABOVE
 
 """
 test_single_target_regressors(args...; kwargs...) =
-    _test(args..., _make_baby_boston(); kwargs...)
+    _test(args..., make_regression(); kwargs...)
 
 
 # # SINGLE TARGET COUNT REGRESSORS
-
-function _make_count()
-    X, y_ = _make_baby_boston()
-    y = map(η -> round(Int, η), y_)
-    return X, y
-end
 
 """
     MLJTestIntegration.test_single_count_regressors(; keyword_options...)
@@ -114,12 +147,12 @@ $DOC_AS_ABOVE
 
 """
 test_single_target_count_regressors(args...; kwargs...) =
-    _test(args..., _make_count(); kwargs...)
+    _test(args..., make_count(); kwargs...)
 
 
 # # CONTINUOUS TABLE TRANSFORMERS
 
-_make_transformer() = (first(_make_baby_boston()),)
+_make_transformer() = (first(make_regression()),)
 
 """
     test_continuous_table_transformers(; keyword_options...)
