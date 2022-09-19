@@ -770,9 +770,9 @@ version = "0.18.4"
 
 [[deps.MLJBase]]
 deps = ["CategoricalArrays", "CategoricalDistributions", "ComputationalResources", "Dates", "DelimitedFiles", "Distributed", "Distributions", "InteractiveUtils", "InvertedIndices", "LinearAlgebra", "LossFunctions", "MLJModelInterface", "Missings", "OrderedCollections", "Parameters", "PrettyTables", "ProgressMeter", "Random", "ScientificTypes", "Serialization", "StatisticalTraits", "Statistics", "StatsBase", "Tables"]
-git-tree-sha1 = "2a3408ccdb08f3ac4f1622ad874bb725144cf5c9"
+path = "/Users/anthony/MLJ/MLJBase"
 uuid = "a7f614a8-145f-11e9-1d2a-a57a1082229d"
-version = "0.20.15"
+version = "0.20.17"
 
 [[deps.MLJClusteringInterface]]
 deps = ["Clustering", "Distances", "MLJModelInterface"]
@@ -824,7 +824,7 @@ version = "0.6.4"
 
 [[deps.MLJModelInterface]]
 deps = ["Random", "ScientificTypesBase", "StatisticalTraits"]
-git-tree-sha1 = "16fa7c2e14aa5b3854bc77ab5f1dbe2cdc488903"
+path = "/Users/anthony/MLJ/MLJModelInterface"
 uuid = "e80e1ace-859a-464e-9ed9-23947d8ae3ea"
 version = "1.6.0"
 

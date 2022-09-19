@@ -55,6 +55,9 @@ Returns `(failures, summary)` where:
 | n/a   | skipped because not applicable     |
 | -     | test skipped for some other reason |
 
+In the special case of `operations`, an empty entry, `""`, indicates that there don't
+appear to be any operations implemented.
+
 # Testing with automatic code loading
 
 World Age issues pose challenges for testing Julia code if some code
@@ -266,7 +269,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         operations, outcome =
             MLJTestIntegration.operations(fitted_machine, data...; throw, verbosity)
         # special treatment to get list of operations in `summary`:
-        if operations == "×"
+        if outcome == "×"
             row = update(row, i, :operations, operations, outcome)
             continue
         else
