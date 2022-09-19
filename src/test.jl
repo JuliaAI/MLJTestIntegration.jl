@@ -9,6 +9,8 @@ function next!(p)
     MLJ.ProgressMeter.updateProgress!(p)
 end
 
+const ENSEMBLE_TARGET_ELSCITYPE = Union{Missing, Continuous, Finite}
+
 """
     test(models, data...; mod=Main, level=2, throw=false, verbosity=1)
 
@@ -382,15 +384,16 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         outcome == "×" && continue
 
         #[ensemble_prediction]:
-        ensemble_prediction, outcome =
-            MLJTestIntegration.ensemble_prediction(
+        if target_scitype(model_type) <: AbstractVector{<:ENSEMBLE_TARGET_ELSCITYPE}
+            ensemble_prediction, outcome = MLJTestIntegration.ensemble_prediction(
                 model_instance,
                 data...;
                 throw,
                 verbosity,
             )
-        row = update(row, i, :ensemble_prediction, ensemble_prediction, outcome)
-        outcome == "×" && continue
+            row = update(row, i, :ensemble_prediction, ensemble_prediction, outcome)
+            outcome == "×" && continue
+        end
 
         # [iteration_prediction]:
         if !isnothing(iteration_parameter(model_instance))
