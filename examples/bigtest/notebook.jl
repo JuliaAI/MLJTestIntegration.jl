@@ -24,6 +24,10 @@ known_problems = models() do model
     any([
         # https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29
         model.package_name == "PartialLeastSquaresRegressor",
+        # https://github.com/jeremiedb/EvoLinear.jl/issues/12
+        model.package_name == "EvoLinear",
+        # waiting for BetaML 0.9.1:
+        model.package_name == "BetaML",
     ])
 end
 
@@ -41,11 +45,9 @@ fails1, report1 =
         verbosity=2,
     )
 
-fails1 |> DataFrame
+@assert isempty(fails1)
 
 #-
-
-report1 |> DataFrame
 
 
 # # Classification
@@ -55,21 +57,9 @@ known_problems = models() do model
         "ScikitLearn",
         "LIBSVM",
         "XGBoost",
-    ] || (name = model.name, package_name = model.package_name) in [
-
-        # https://github.com/JuliaAI/MLJMultivariateStatsInterface.jl/issues/41
-        (name = "LDA", package_name = "MultivariateStats"),
-        (name = "SubspaceLDA", package_name = "MultivariateStats"),
-        (name = "BayesianLDA", package_name = "MultivariateStats"),
-        (name = "BayesianSubspaceLDA", package_name = "MultivariateStats"),
-
-        # https://github.com/JuliaAI/MLJBase.jl/issues/781
-        (name = "DecisionTreeClassifier", package_name="BetaML"),
-        (name="RandomForestClassifier", package_name="BetaML"),
-
-        # https://github.com/alan-turing-institute/MLJ.jl/issues/939
-        (name = "NuSVC", package_name="LIBSVM"),
-    ]
+        "BetaML", # waiting for BetaML 0.9.1:
+        "EvoLinear", # https://github.com/jeremiedb/EvoLinear.jl/issues/12
+    ] || (name = model.name, package_name = model.package_name) in []
 end
 
 MLJTestIntegration.test_single_target_classifiers(
@@ -86,8 +76,4 @@ fails2, report2 =
         verbosity=2
     )
 
-fails2 |> DataFrame
-
-#-
-
-report2 |> DataFrame
+@assert isempty(fails2)

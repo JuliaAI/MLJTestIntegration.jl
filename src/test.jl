@@ -10,6 +10,10 @@ function next!(p)
 end
 
 const ENSEMBLE_TARGET_ELSCITYPE = Union{Missing, Continuous, Finite}
+const WARN_FAILURES_ENCOUNTERED =
+    "Some errors were encountered. To isolate specific errors you may want "*
+    "test again, specifiying `throw=false` to get a full stack trace. You may also want "*
+    "limit tests to problem model(s). "
 
 """
     test(models, data...; mod=Main, level=2, throw=false, verbosity=1)
@@ -454,6 +458,8 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         end
 
     end
+
+    isempty(failures) || verbosity > -1 && @warn WARN_FAILURES_ENCOUNTERED
 
     return failures, summary
 end
