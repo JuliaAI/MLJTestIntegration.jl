@@ -956,7 +956,7 @@ version = "0.7.1"
 
 [[deps.MLJModelInterface]]
 deps = ["Random", "ScientificTypesBase", "StatisticalTraits"]
-path = "/Users/anthony/MLJ/MLJModelInterface"
+git-tree-sha1 = "4040c0da2bd05130687cc258c1318acd32bace90"
 uuid = "e80e1ace-859a-464e-9ed9-23947d8ae3ea"
 version = "1.7.1"
 
