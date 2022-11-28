@@ -253,7 +253,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
         row = merge(row0, (; name, package_name))
 
         # [model_type]:
-        model_type, outcome = MLJTestIntegration.model_type(model_proxy, mod; throw, verbosity)
+        model_type, outcome = MTI.model_type(model_proxy, mod; throw, verbosity)
         row = update(row, i, :model_type, model_type, outcome)
         outcome == "×" && continue
 
@@ -261,19 +261,19 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
 
         # [model_instance]:
         model_instance, outcome =
-            MLJTestIntegration.model_instance(model_type; throw, verbosity)
+            MTI.model_instance(model_type; throw, verbosity)
         row = update(row, i, :model_instance, model_instance, outcome)
         outcome == "×" && continue
 
         # [fitted_machine]:
         fitted_machine, outcome =
-            MLJTestIntegration.fitted_machine(model_instance, data...; throw, verbosity)
+            MTI.fitted_machine(model_instance, data...; throw, verbosity)
         row = update(row, i, :fitted_machine, fitted_machine, outcome)
         outcome == "×" && continue
 
         # [operations]:
         operations, outcome =
-            MLJTestIntegration.operations(fitted_machine, data...; throw, verbosity)
+            MTI.operations(fitted_machine, data...; throw, verbosity)
         # special treatment to get list of operations in `summary`:
         if outcome == "×"
             row = update(row, i, :operations, operations, outcome)

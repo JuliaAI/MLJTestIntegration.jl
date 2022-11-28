@@ -7,6 +7,9 @@ using Pkg
 using .Threads
 using Test
 using NearestNeighborModels
+import MLJTestInterface
+const MTI = MLJTestInterface
+import MLJTestInterface.attempt
 
 include("attemptors.jl")
 include("test.jl")
