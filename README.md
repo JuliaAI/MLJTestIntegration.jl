@@ -4,6 +4,9 @@ Package for applying integration tests to models implementing the
 [MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/) model
 interface.
 
+**To test implementations of the MLJ model interface, use [MLJTestInterface.jl](https://github.com/JuliaAI/MLJTestInterface.jl)
+instead.**
+
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md) [![Build Status](https://github.com/JuliaAI/MLJTestIntegration.jl/workflows/CI/badge.svg)](https://github.com/JuliaAI/MLJTestIntegration.jl/actions) [![Coverage](https://codecov.io/gh/JuliaAI/MLJTestIntegration.jl/branch/master/graph/badge.svg)](https://codecov.io/github/JuliaAI/MLJTestIntegration.jl?branch=master) 
 
 # Installation
@@ -37,22 +40,7 @@ Query the document strings for details, or see
 [examples/bigtest/notebook.jl](examples/bigtest/notebook.jl).
 
 
-# Examples
-
-## Testing models in a new MLJ model interface implementation
-
-The following tests the model interface implemented by some model type `MyClassifier` for
-multiclass classification, as might appear in tests for a package providing that type:
-
-```julia
-import MLJTestIntegration
-using Test
-X, y = MLJTestIntegration.make_multiclass()
-failures, summary = MLJTestIntegration.test([MyClassifier, ], X, y, verbosity=1, mod=@__MODULE__)
-@test isempty(failures)
-```
-
-## Testing models after filtering models in the registry
+# Example: Testing models filtered from the MLJ model registry
 
 The following applies comprehensive integration tests to all
 regressors provided by the package GLM.jl appearing in the MLJ Model
@@ -69,7 +57,9 @@ regressors = MLJTestIntegration.MLJ.models(matching(X, y)) do m
 end
 
 # to test code loading:
-MLJTestIntegration.test(regressors, X, y, verbosity=2, mod=@__MODULE__, level=1)
+failures, summary = 
+    MLJTestIntegration.test(regressors, X, y, verbosity=2, mod=@__MODULE__, level=1)
+@assert isempty(failures)
 
 # comprehensive tests:
 failures, summary =
