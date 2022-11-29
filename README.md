@@ -4,7 +4,7 @@ Package for applying integration tests to models implementing the
 [MLJ](https://alan-turing-institute.github.io/MLJ.jl/dev/) model
 interface.
 
-**To test implementations of the MLJ model interface, use [MLJTestInterface.jl]()
+**To test implementations of the MLJ model interface, use [MLJTestInterface.jl](https://github.com/JuliaAI/MLJTestInterface.jl)
 instead.**
 
 [![Lifecycle:Experimental](https://img.shields.io/badge/Lifecycle-Experimental-339999)](https://github.com/bcgov/repomountie/blob/master/doc/lifecycle-badges.md) [![Build Status](https://github.com/JuliaAI/MLJTestIntegration.jl/workflows/CI/badge.svg)](https://github.com/JuliaAI/MLJTestIntegration.jl/actions) [![Coverage](https://codecov.io/gh/JuliaAI/MLJTestIntegration.jl/branch/master/graph/badge.svg)](https://codecov.io/github/JuliaAI/MLJTestIntegration.jl?branch=master) 
