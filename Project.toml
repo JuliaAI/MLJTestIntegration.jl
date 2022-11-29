@@ -12,5 +12,6 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 MLJ = "0.18, 0.19, 0.20"
+MLJTestInterface = "0.1"
 NearestNeighborModels = "0.2"
 julia = "1.6"
