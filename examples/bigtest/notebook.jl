@@ -59,7 +59,11 @@ known_problems = models() do model
         "XGBoost",
         "BetaML", # waiting for BetaML 0.9.1:
         "EvoLinear", # https://github.com/jeremiedb/EvoLinear.jl/issues/12
-    ] || (name = model.name, package_name = model.package_name) in []
+    ] || (name = model.name, package_name = model.package_name) in [
+        # https://github.com/OutlierDetectionJL/OutlierDetectionNetworks.jl/issues/8
+        (name = "ESADDetector", package_name="OutlierDetectionNetworks"),
+        (name = "DSADDetector", package_name="OutlierDetectionNetworks"),
+    ]
 end
 
 MLJTestIntegration.test_single_target_classifiers(
