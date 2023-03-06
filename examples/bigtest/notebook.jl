@@ -35,6 +35,7 @@ MLJTestIntegration.test_single_target_regressors(
     known_problems,
     ignore=true,
     level=1,
+    throw=true,
 )
 
 fails1, report1 =
@@ -70,6 +71,7 @@ MLJTestIntegration.test_single_target_classifiers(
     known_problems,
     level=1,
     ignore=true,
+    throw=true,
 )
 
 fails2, report2 =
