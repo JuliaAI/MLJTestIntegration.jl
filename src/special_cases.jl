@@ -77,7 +77,7 @@ function make_regression()
 end
 
 """
-    make_regression()
+    make_count()
 
 Return data `(X, y)` for the Boston dataset, restricted to the two features `:LStat`,
 `:Rm`, with the `Continuous` target converted to `Count` (integer).
