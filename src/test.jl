@@ -111,7 +111,7 @@ MLJTestIntegration.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=1)
 
 # comprehensive tests:
 failures, summary =
-    MLJTestIntegration.test(regressors, X, y, verbosity=3, mod=@__MODULE__, level=1)
+    MLJTestIntegration.test(regressors, X, y, verbosity=1, mod=@__MODULE__, level=3)
 
 summary |> DataFrame
 ```
