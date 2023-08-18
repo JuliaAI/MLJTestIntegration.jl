@@ -17,15 +17,15 @@ using DataFrames # for displaying tables
 
 known_problems = models() do model
     model.package_name in [
-        "ScikitLearn",
+        # as python models, problems with multithreading:
+        "MLJScikitLearnInterface",
         "LIBSVM",
         "XGBoost",
-        # https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29
+        "CatBoost",
+        # https://github.com/lalvim/PartialLeastSquaresRegressor.jl/issues/29]
+        # waiting for a release > 2.2.0 (issue addressed on master)
         "PartialLeastSquaresRegressor",
-    ] || (name = model.name, package_name = model.package_name) in [
-        # https://github.com/sylvaticus/BetaML.jl/issues/53
-        (name = "MultitargetNeuralNetworkRegressor", package_name="BetaML"),
-    ]
+    ] || (name = model.name, package_name = model.package_name) in []
 end
 
 MLJTestIntegration.test_single_target_regressors(
@@ -53,13 +53,18 @@ fails1, report1 =
 
 known_problems = models() do model
     model.package_name in [
-        "ScikitLearn",
+        # as python models, problems with multithreading:
+        "MLJScikitLearnInterface",
         "LIBSVM",
         "XGBoost",
+        "CatBoost",
     ] || (name = model.name, package_name = model.package_name) in [
         # https://github.com/OutlierDetectionJL/OutlierDetectionNetworks.jl/issues/8
         (name = "ESADDetector", package_name="OutlierDetectionNetworks"),
         (name = "DSADDetector", package_name="OutlierDetectionNetworks"),
+        # https://github.com/rikhuijzer/SIRUS.jl/issues/43
+        (name = "StableForestClassifier", package_name="SIRUS"),
+        (name = "StableRulesClassifier", package_name="SIRUS"),
     ]
 end
 

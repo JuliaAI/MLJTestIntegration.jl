@@ -1,5 +1,6 @@
 [deps]
 BetaML = "024491cd-cc6b-443e-8034-08ea7eb7db2b"
+CatBoost = "e2e10f9a-a85d-4fa9-b6b2-639a32100a12"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 EvoLinear = "ab853011-1780-437f-b4b5-5de6f4777246"
 EvoTrees = "f6006082-12f8-11e9-0c9c-0d5d367ab1e5"
@@ -30,7 +31,9 @@ OutlierDetectionPython = "2449c660-d36c-460e-a68b-92ab3c865b3e"
 ParallelKMeans = "42b8e9d4-006b-409a-8472-7f34b3fb58af"
 PartialLeastSquaresRegressor = "f4b1acfe-f311-436c-bb79-8483f53c17d5"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+SIRUS = "cdeec39e-fb35-4959-aadb-a1dd5dede958"
 StatisticalTraits = "64bff920-2084-43da-a3e6-9bb72801c0c9"
+SymbolicRegression = "8254be44-1295-4e6a-a16d-46603ac705cb"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [extras]
