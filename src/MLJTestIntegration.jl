@@ -10,6 +10,7 @@ using NearestNeighborModels
 import MLJTestInterface
 const MTI = MLJTestInterface
 import MLJTestInterface.attempt
+import MLJTestInterface: make_binary, make_multiclass, make_regression, make_count
 
 include("attemptors.jl")
 include("test.jl")
