@@ -38,6 +38,19 @@ function _test(proxies, data; ignore::Bool=false, verbosity=1, kwargs...)
 end
 _test(data; ignore=true, kwargs...) = _test([], data; ignore, kwargs...)
 
+function __test(data_generator, args...; verbosity=1, kwargs...)
+    verbosity > 1 && @info "\nUSING COLUMN-BASED DATASETS: "
+    fails, report = _test(args..., data_generator(); verbosity, kwargs...)
+    ret = Dict("column table tests" => Dict("fails" => fails, "report" => report))
+    verbosity > 1 && @info "\nUSING ROW-BASED DATASETS: "
+    fails, report = _test(args..., data_generator(row_table=true); verbosity, kwargs...)
+    ret["row table tests"] = Dict("fails" => fails, "report" => report)
+    return ret
+end
+
+
+_make_transformer(; kwargs...) = (first(make_regression(; kwargs...)),)
+
 
 
 # # SINGLE TARGET CLASSIFICATION
@@ -57,8 +70,7 @@ $DOC_AS_ABOVE
 
 """
 test_single_target_classifiers(args...; kwargs...) =
-    _test(args..., make_binary(); kwargs...)
-
+    __test(make_binary, args...; kwargs...)
 
 # # SINGLE TARGET REGRESSION
 
@@ -75,8 +87,8 @@ passed onto `MLJTestIntegration.test`.
 $DOC_AS_ABOVE
 
 """
-test_single_target_regressors(args...; kwargs...) =
-    _test(args..., make_regression(); kwargs...)
+test_single_target_regressors(args...;  kwargs...) =
+    __test(make_regression, args...; kwargs...)
 
 
 # # SINGLE TARGET COUNT REGRESSORS
@@ -97,12 +109,10 @@ $DOC_AS_ABOVE
 
 """
 test_single_target_count_regressors(args...; kwargs...) =
-    _test(args..., make_count(); kwargs...)
+    __test(make_count, args...; kwargs...)
 
 
 # # CONTINUOUS TABLE TRANSFORMERS
-
-_make_transformer() = (first(make_regression()),)
 
 """
     test_continuous_table_transformers(; keyword_options...)
@@ -115,6 +125,8 @@ using a two-feature selection of the Boston dataset.  The specifed
     test_continuous_table_transformers(models; ignore=false, keyword_options...)
 
 $DOC_AS_ABOVE
+
 """
 test_continuous_table_transformers(args...; kwargs...) =
-    _test(args..., _make_transformer(); kwargs...)
+    __test(_make_transformer, args...; kwargs...)
+
