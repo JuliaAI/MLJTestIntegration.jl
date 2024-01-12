@@ -29,16 +29,6 @@ MLJTestIntegration.test(models, data...; mod=Main, level=2, throw=false, verbosi
 
 For detailed documentation, run `using MLJTestIntegration; @doc MLJTestIntegration.test`.
 
-For convenience, a number of specializations of this method are also provided: 
-
-- `test_single_target_classifiers`
-- `test_single_target_regressors`
-- `test_single_target_count_regressors`
-- `test_continuous_table_transformers`
-
-Query the document strings for details, or see
-[examples/bigtest/notebook.jl](examples/bigtest/notebook.jl).
-
 
 # Example: Testing models filtered from the MLJ model registry
 

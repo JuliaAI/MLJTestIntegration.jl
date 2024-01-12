@@ -13,6 +13,7 @@ Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
 MLJ = "0.18, 0.19, 0.20"
+MLJModels = "0.16"
 MLJTestInterface = "0.2.4"
 NearestNeighborModels = "0.2"
 Pkg = "<0.0.1, 1"
