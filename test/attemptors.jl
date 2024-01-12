@@ -1,3 +1,10 @@
+using Test
+using Pkg
+using MLJTestIntegration
+using MLJ
+using MLJ.MLJModels
+const MTI = MLJTestIntegration
+
 @testset "model_type with model proxy instead of type" begin
 
     # test error thrown (not caught) if pkg missing from environment:

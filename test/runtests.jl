@@ -1,12 +1,7 @@
 using Test
-using Pkg
-using MLJTestIntegration
-using MLJTestIntegration.MLJ
-using MLJTestIntegration.MLJ.MLJModels
-const MTI = MLJTestIntegration
 
 # enable conditional testing of modules by providing test_args
-# e.g. `Pkg.test("MLJBase", test_args=["misc"])`
+# e.g. `Pkg.test("MLJTestIntegration", test_args=["attemptors"])`
 
 const RUN_ALL_TESTS = isempty(ARGS)
 macro conditional_testset(name, expr)
@@ -16,6 +11,10 @@ macro conditional_testset(name, expr)
             @testset $name $expr
         end
     end)
+end
+
+@conditional_testset "datasets" begin
+    include("datasets.jl")
 end
 
 @conditional_testset "attemptors" begin
