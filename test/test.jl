@@ -1,3 +1,10 @@
+using Test
+using Pkg
+using MLJTestIntegration
+using MLJ
+using MLJModels
+const MTI = MLJTestIntegration
+
 classifiers = [
     (name = "ConstantClassifier", package_name = "MLJModels"),
     (name = "DeterministicConstantClassifier", package_name = "MLJModels")
