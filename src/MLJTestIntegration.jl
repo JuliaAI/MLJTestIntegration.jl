@@ -6,15 +6,15 @@ using MLJ
 using Pkg
 using .Threads
 using Test
-using NearestNeighborModels
+using NearestNeighborModels # needed for building stacks
 import MLJTestInterface
 const MTI = MLJTestInterface
 import MLJTestInterface.attempt
 import MLJTestInterface: make_binary, make_multiclass, make_regression, make_count
 
+include("datasets.jl")
 include("attemptors.jl")
 include("test.jl")
-include("special_cases.jl")
 include("dummy_model.jl")
 
 function __init__()

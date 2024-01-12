@@ -12,20 +12,27 @@ end
 const ENSEMBLE_TARGET_ELSCITYPE = Union{Missing, Continuous, Finite}
 const WARN_FAILURES_ENCOUNTERED =
     "Some errors were encountered. To isolate specific errors you may want "*
-    "test again, specifiying `throw=false` to get a full stack trace. You may also want "*
-    "limit tests to problem model(s). "
+    "test again, specifiying `throw=false` to get a full stack trace, or bump "*
+    "`verbosity`. "
+ERR_NO_DATASETS(model) = ArgumentError(
+    "No MLJTestIntegration.jl dataset appear to apply to `$model`. "
+)
 
 """
     test(models, data...; mod=Main, level=2, throw=false, verbosity=1)
+    test(model; mod=Main, level=2, throw=false, verbosity=1)
 
-Apply a battery of MLJ integration tests to a collection of models,
-using `data` for training. Here `mod` should be the module from which
-`test` is called (generally, `mod=@__MODULE__` will work). Here
-`models` is either:
+The first signature above applies a battery of MLJ integration tests to a collection of
+models, using `data` for training. Here `mod` should be the module from which `test` is
+called (generally, `mod=@__MODULE__` will work). Here `models` is either:
 
 1. A collection of model types implementing the [MLJ model interface](https://alan-turing-institute.github.io/MLJ.jl/dev/adding_models_for_general_use/).
 
 2. A collection of named tuples, where each tuple includes `:name` and `:package_name` as keys, and whose corresponding values point to a model type appearing in the [MLJ Model Registry](https://github.com/JuliaAI/MLJModels.jl/tree/dev/src/registry). `MLJ.models(...)` always returns such a collection.
+
+The second signature applies the same tests to a single `model` (of either type above) but
+applies them using all MLJTestIntegration.jl datasets that might conceivable apply. If
+none appear to apply, an exception is thrown.
 
 Ordinarily, code defining the model types to be tested must already be
 loaded into the module `mod`. An exception is described under "Testing
@@ -47,7 +54,7 @@ traces).
 
 # Return value
 
-Returns `(failures, summary)` where:
+The first signature returns `(failures, summary)` where:
 
 - `failures`: table of exceptions thrown
 
@@ -63,6 +70,8 @@ Returns `(failures, summary)` where:
 
 In the special case of `operations`, an empty entry, `""`, indicates that there don't
 appear to be any operations implemented.
+
+The second signature returns a vector of exceptions encountered.
 
 # Testing with automatic code loading
 
@@ -357,7 +366,7 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
             end
         end
 
-        length(resources) > 1 && verbosity > 0 &&
+        length(resources) > 1 && verbosity > 1 &&
             @info "Testing with $(nthreads()) threads. "
 
         # [accelerated_evaluation]:
@@ -462,4 +471,34 @@ function test(model_proxies, data...; mod=Main, level=2, throw=false, verbosity=
     isempty(failures) || verbosity > -1 && @warn WARN_FAILURES_ENCOUNTERED
 
     return failures, summary
+end
+
+function test(model; mod=Main, level=2, throw=false, verbosity=1,)
+    datasets = MLJTestIntegration.datasets(model)
+    isempty(datasets) && Base.throw(ERR_NO_DATASETS(model))
+    exceptions = []
+    verbosity > 1 && @info "\n\n$(length(datasets)) datasets suitable for testing found; "*
+        "retrieve datasets with `MLJTestIntegration.datasets(model). "
+    for (i, data) in enumerate(datasets)
+        verbosity > 1 && @info "\nDataset number $i:"
+
+        fails, summary =
+            test([model, ], data...; mod, level, throw, verbosity)
+
+        if verbosity > 1
+            @info "\nSummary of tests performed:"
+            show(stdout, MIME("text/plain"), only(summary))
+            println()
+        end
+        if !isempty(fails)
+            if verbosity > 0
+                @warn "\n Failures encounted for these tests:"
+                for e in fails
+                    @warn "\t [$(e.test)]"
+                    push!(exceptions, e)
+                end
+            end
+        end
+    end
+    return exceptions
 end
