@@ -491,12 +491,10 @@ function test(model; mod=Main, level=2, throw=false, verbosity=1,)
             println()
         end
         if !isempty(fails)
-            if verbosity > 0
-                @warn "\n Failures encounted for these tests:"
-                for e in fails
-                    @warn "\t [$(e.test)]"
-                    push!(exceptions, e)
-                end
+            verbosity > 0 && @warn "\n Failures encounted for these tests:"
+            for e in fails
+                @warn "\t [$(e.test)]"
+                push!(exceptions, e)
             end
         end
     end

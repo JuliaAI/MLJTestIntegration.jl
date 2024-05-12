@@ -4,6 +4,7 @@ using MLJTestIntegration
 using MLJ
 using MLJModels
 const MTI = MLJTestIntegration
+const MMI = MLJ.MLJBase.MLJModelInterface
 
 classifiers = [
     (name = "ConstantClassifier", package_name = "MLJModels"),
@@ -313,6 +314,20 @@ end
         stack_evaluation = "-",
         accelerated_stack_evaluation = "-",
     )
+end
+
+struct JunkModel <: Deterministic end
+
+MMI.fit(::JunkModel, verbosity, X, y) = error("I am always broken")
+MMI.input_scitype(::Type{JunkModel}) = Table(Continuous)
+MMI.target_scitype(::Type{JunkModel}) = AbstractVector{<:Continuous}
+
+@testset "test(model, ...) catches failure" begin
+    @test(@test_logs(
+        (:warn, MTI.WARN_FAILURES_ENCOUNTERED),
+        match_mode=:any,
+        !isempty(MTI.test(JunkModel; mod=@__MODULE__, verbosity=0, throw=false)),
+    ))
 end
 
 true
