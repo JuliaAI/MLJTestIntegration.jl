@@ -18,7 +18,7 @@ MLJTestInterface = "0.2.4"
 NearestNeighborModels = "0.2"
 Pkg = "<0.0.1, 1"
 Test = "<0.0.1, 1"
-julia = "1.6"
+julia = "1.10"
 
 [extras]
 MLJDecisionTreeInterface = "c6f25543-311c-4c74-83dc-3ea6d1015661"
