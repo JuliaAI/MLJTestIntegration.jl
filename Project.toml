@@ -12,7 +12,7 @@ Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [compat]
-MLJ = "0.18, 0.19, 0.20, 0.21"
+MLJ = "0.18, 0.19, 0.20, 0.21, 0.22"
 MLJModels = "0.16, 0.17, 0.18"
 MLJTestInterface = "0.2.4"
 MLJTransforms = "0.1.3"
