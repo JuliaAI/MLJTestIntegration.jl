@@ -6,7 +6,7 @@ const MTI = MLJTestIntegration
 
 Rgs = @load KNNRegressor pkg=NearestNeighborModels verbosity=0
 Clf = @load KNNClassifier pkg= NearestNeighborModels verbosity=0
-Trf = @load Standardizer pkg=MLJModels verbosity=0
+Trf = @load Standardizer pkg=MLJTransforms verbosity=0
 
 Rgs_proxy = models() do m
     m.name == "KNNRegressor" && m.package_name == "NearestNeighborModels"
