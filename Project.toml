@@ -7,6 +7,7 @@ version = "0.5.3"
 MLJ = "add582a8-e3ab-11e8-2d5e-e98b27df1bc7"
 MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
 MLJTestInterface = "72560011-54dd-4dc2-94f3-c5de45b75ecd"
+MLJTransforms = "23777cdb-d90c-4eb0-a694-7c2b83d5c1d6"
 NearestNeighborModels = "636a865e-7cf4-491e-846c-de09b730eb36"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
@@ -23,7 +24,8 @@ julia = "1.10"
 [extras]
 MLJDecisionTreeInterface = "c6f25543-311c-4c74-83dc-3ea6d1015661"
 MLJModels = "d491faf4-2d78-11e9-2867-c94bc002c0b7"
+MLJTransforms = "0.1.3"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
-test = ["MLJDecisionTreeInterface", "MLJModels", "Test"]
+test = ["MLJDecisionTreeInterface", "MLJModels", "MLJTransforms", "Test"]
